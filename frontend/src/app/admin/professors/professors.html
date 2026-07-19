@@ -1,0 +1,275 @@
+<div class="professors-container">
+  <div class="page-header">
+    <div>
+      <h1>Manage Professor Profiles</h1>
+    </div>
+    <!-- Header Actions Removed (Manual Creation Not Allowed) -->
+  </div>
+
+  <!-- Error display -->
+  @if (error && !loading) {
+    <div class="error-banner">
+      <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-bar" style="display: flex; gap: 12px; align-items: center;">
+    <div class="search-input-wrapper" style="display: flex; align-items: center; gap: 8px; flex: 1;">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search by name or employee code..."
+        class="search-input"
+        style="flex: 1;"
+      />
+      <button (click)="onSearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center;">Search</button>
+    </div>
+
+    <div class="filter-dropdown-wrapper">
+      <select
+        [(ngModel)]="selectedDepartment"
+        (change)="applyLocalFilters()"
+        class="department-select"
+      >
+        <option value="">All Departments</option>
+        @for (dep of departments; track dep) {
+          <option [value]="dep">{{ dep }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Professor profile list -->
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-wrapper">
+        <div class="spinner"></div>
+        <p>Loading professor profiles...</p>
+      </div>
+    } @else {
+      @if (filteredProfessors.length === 0) {
+        <div class="empty-state">
+          <p>No professor profiles match your search criteria.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="professors-table">
+            <thead>
+              <tr>
+                <th>Employee Code</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of filteredProfessors; track p.professorId) {
+                <tr>
+                  <td class="font-semibold">{{ p.employeeCode }}</td>
+                  <td>{{ p.name }}</td>
+                  <td>{{ p.department }}</td>
+                  <td>{{ p.designation }}</td>
+
+                  <td>
+                    <div class="action-buttons">
+                      <a [routerLink]="['/admin/users', p.userId, 'details']" class="action-btn view-btn" style="text-decoration: none;" title="View details">
+                        View Details
+                      </a>
+                      <button (click)="openEditModal(p)" class="action-btn edit-btn" title="Edit professor">
+                        Edit
+                      </button>
+                      <button (click)="deleteProfessor(p.professorId)" class="action-btn delete-btn" title="Delete professor">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create/Edit Modal Popup Overlay -->
+  @if (showModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>{{ modalTitle }}</h2>
+          <button (click)="closeModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (formError) {
+            <div class="modal-error-banner">
+              {{ formError }}
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                [(ngModel)]="formName"
+                placeholder="e.g. Dr. Robert Miller"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="employeeCode">Employee Code</label>
+              <input
+                type="text"
+                id="employeeCode"
+                [(ngModel)]="formEmployeeCode"
+                placeholder="e.g. EMP-99801"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input
+                type="text"
+                id="department"
+                [(ngModel)]="formDepartment"
+                placeholder="e.g. Mathematics"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="designation">Designation</label>
+              <input
+                type="text"
+                id="designation"
+                [(ngModel)]="formDesignation"
+                placeholder="e.g. Associate Professor"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input
+              type="text"
+              id="contactNumber"
+              [(ngModel)]="formContactNumber"
+              placeholder="e.g. +1 555-0199"
+              class="form-control"
+            />
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeModal()" class="btn-secondary">Cancel</button>
+          <button (click)="saveProfessor()" class="btn-primary">Save Profile</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- View Details Modal Overlay -->
+  @if (showDetailModal) {
+    <div class="modal-overlay">
+      <div class="modal-card wide">
+        <div class="modal-header">
+          <h2>Professor Profile details: {{ selectedProfessor?.name }}</h2>
+          <button (click)="closeDetailModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="details-section">
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-lbl">Employee Code:</span>
+                <span class="detail-val font-semibold">{{ selectedProfessor?.employeeCode }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Department:</span>
+                <span class="detail-val">{{ selectedProfessor?.department }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Designation:</span>
+                <span class="detail-val">{{ selectedProfessor?.designation }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Contact Number:</span>
+                <span class="detail-val font-semibold">{{ selectedProfessor?.contactNumber || 'N/A' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Login Account:</span>
+                <span class="detail-val font-semibold">@{{ selectedProfessor?.username }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="courses-section">
+            <h3>Assigned Teaching Courses</h3>
+            @if (coursesLoading) {
+              <div class="loading-wrapper compact">
+                <div class="spinner"></div>
+                <p>Loading course assignments...</p>
+              </div>
+            } @else {
+              @if (coursesError) {
+                <div class="error-banner compact">
+                  {{ coursesError }}
+                </div>
+              } @else {
+                @if (selectedProfessorCourses.length === 0) {
+                  <p class="empty-courses">This professor is not currently assigned to teach any courses.</p>
+                } @else {
+                  <div class="table-container compact">
+                    <table class="professors-table compact">
+                      <thead>
+                        <tr>
+                          <th>Course Code</th>
+                          <th>Course Name</th>
+                          <th>Credits</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (c of selectedProfessorCourses; track c.courseId) {
+                          <tr>
+                            <td class="font-semibold">{{ c.courseCode }}</td>
+                            <td>{{ c.courseName }}</td>
+                            <td>{{ c.credits }} Credits</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              }
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeDetailModal()" class="btn-primary">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

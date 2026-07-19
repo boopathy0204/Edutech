@@ -1,0 +1,62 @@
+<div class="app-layout-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/>
+      </svg>
+      <span class="brand-text">EduTech Portal</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <ul>
+        @for (item of navItems; track item.label) {
+          <li>
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+              {{ item.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="nav-left">
+        <div class="period-selector-wrapper" style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Academic Period:</span>
+          <select 
+            [ngModel]="selectedPeriod" 
+            [compareWith]="comparePeriods"
+            (ngModelChange)="onPeriodChange($event)"
+            style="padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 6px; outline: none; font-size: 13px; background-color: white; font-family: inherit; font-weight: 500; cursor: pointer;"
+          >
+            @for (period of periods; track period.academicPeriodId) {
+              <option [ngValue]="period">
+                {{ period.academicYear }} - {{ period.academicHalf }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="user-profile-badge">
+          <span class="user-name">{{ username }}</span>
+          <span class="user-role-tag">{{ role }}</span>
+        </div>
+        <button (click)="logout()" class="logout-btn">
+          Log Out
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Viewport -->
+    <main class="page-viewport">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,312 @@
+<div class="onboarding-container">
+  <div class="onboarding-card">
+    <div class="card-header">
+      <div class="user-icon-wrapper">
+        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <h2>Complete Your Profile</h2>
+      <p class="subtitle">Please provide your details below to finish setting up your account and access the university portal.</p>
+    </div>
+
+    @if (formError) {
+      <div class="alert-banner error">
+        <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ formError }}</span>
+      </div>
+    }
+
+    <!-- Student Profile Form -->
+    @if (role === 'STUDENT') {
+      <form (ngSubmit)="saveStudentProfile()" class="onboarding-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="regNum">Registration Number</label>
+            <input
+              type="text"
+              id="regNum"
+              [(ngModel)]="formRegistrationNumber"
+              name="regNum"
+              required
+              placeholder="e.g. 922526118004"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input
+              type="text"
+              id="phone"
+              [(ngModel)]="formPhone"
+              name="phone"
+              required
+              placeholder="Enter your contactNumber"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              [(ngModel)]="formFirstName"
+              name="firstName"
+              required
+              placeholder="Enter your firstname"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              [(ngModel)]="formLastName"
+              name="lastName"
+              placeholder="Enter your lastName"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="department">Department</label>
+            <input
+              type="text"
+              id="department"
+              [(ngModel)]="formDepartment"
+              name="department"
+              required
+              placeholder="e.g. Computer Science"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="program">Program / Course</label>
+            <input
+              type="text"
+              id="program"
+              [(ngModel)]="formProgram"
+              name="program"
+              required
+              placeholder="e.g. B.Sc. IT"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading" class="submit-btn">
+            @if (loading) { Saving Details... } @else { Save Student Profile }
+          </button>
+          <button type="button" (click)="logout()" class="cancel-btn">
+            Log Out
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Professor Profile Form -->
+    @if (role === 'PROFESSOR') {
+      <form (ngSubmit)="saveProfessorProfile()" class="onboarding-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstNameProf">First Name</label>
+            <input
+              type="text"
+              id="firstNameProf"
+              [(ngModel)]="formFirstNameProf"
+              name="firstNameProf"
+              required
+              placeholder="Enter your first name"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lastNameProf">Last Name</label>
+            <input
+              type="text"
+              id="lastNameProf"
+              [(ngModel)]="formLastNameProf"
+              name="lastNameProf"
+              placeholder="Enter your last name"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="empCode">Employee Code</label>
+            <input
+              type="text"
+              id="empCode"
+              [(ngModel)]="formEmployeeCode"
+              name="empCode"
+              required
+              placeholder="e.g. PRO-001"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="contactNumberProf">Contact Number</label>
+            <input
+              type="text"
+              id="contactNumberProf"
+              [(ngModel)]="formContactNumberProf"
+              name="contactNumberProf"
+              required
+              placeholder="Enter your contact number"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="deptProf">Department</label>
+            <input
+              type="text"
+              id="deptProf"
+              [(ngModel)]="formDepartmentProf"
+              name="deptProf"
+              required
+              placeholder="e.g. Mathematics"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="designation">Designation</label>
+            <input
+              type="text"
+              id="designation"
+              [(ngModel)]="formDesignation"
+              name="designation"
+              required
+              placeholder="e.g. Associate Professor"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading" class="submit-btn">
+            @if (loading) { Saving Details... } @else { Save Professor Profile }
+          </button>
+          <button type="button" (click)="logout()" class="cancel-btn">
+            Log Out
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Admin Profile Form -->
+    @if (role === 'ADMIN') {
+      <form (ngSubmit)="saveAdminProfile()" class="onboarding-form">
+        <div class="form-group">
+          <label for="empCodeAdmin">Employee Code</label>
+          <input
+            type="text"
+            id="empCodeAdmin"
+            [(ngModel)]="formEmployeeCodeAdmin"
+            name="empCodeAdmin"
+            required
+            placeholder="e.g. AMD-001"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="firstNameAdmin">First Name</label>
+            <input
+              type="text"
+              id="firstNameAdmin"
+              [(ngModel)]="formFirstNameAdmin"
+              name="firstNameAdmin"
+              required
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="lastNameAdmin">Last Name</label>
+            <input
+              type="text"
+              id="lastNameAdmin"
+              [(ngModel)]="formLastNameAdmin"
+              name="lastNameAdmin"
+              required
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contactNumberAdmin">Contact Number</label>
+          <input
+            type="text"
+            id="contactNumberAdmin"
+            [(ngModel)]="formContactNumberAdmin"
+            name="contactNumberAdmin"
+            required
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="deptAdmin">Department</label>
+            <input
+              type="text"
+              id="deptAdmin"
+              [(ngModel)]="formDepartmentAdmin"
+              name="deptAdmin"
+              required
+              placeholder="e.g. Administrator"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="desigAdmin">Designation</label>
+            <input
+              type="text"
+              id="desigAdmin"
+              [(ngModel)]="formDesignationAdmin"
+              name="desigAdmin"
+              required
+              placeholder="e.g. System Administrator"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading" class="submit-btn">
+            @if (loading) { Saving Details... } @else { Save Admin Profile }
+          </button>
+          <button type="button" (click)="logout()" class="cancel-btn">
+            Log Out
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

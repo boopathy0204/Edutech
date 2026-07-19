@@ -1,0 +1,160 @@
+<div class="materials-container">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px;">
+    <div>
+      <h1 style="margin: 0 0 4px 0;">Course Materials Manager</h1>
+      <p class="subtitle" style="margin: 0;">Upload handouts, lectures notes, slides, and syllabus files for student download.</p>
+    </div>
+    <button (click)="openUploadModal()" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+      📤 Publish Material
+    </button>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+  @if (error && !showModal) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  <div class="materials-split-layout">
+    <!-- Materials Grid List (Right Area) -->
+    <div class="materials-main-col">
+      <h2 class="sidebar-title">Uploaded Handouts & Files</h2>
+
+      <!-- Filters Card -->
+      <div class="filters-card">
+        <div class="search-box" style="display: flex; gap: 8px; align-items: center; flex: 1;">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="applySearch()" 
+            placeholder="Search material by title..." 
+            class="filter-input search-input"
+            style="flex: 1;"
+          />
+          <button (click)="applySearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center; background-color: var(--color-primary); color: #ffffff; border: 1px solid var(--color-primary); border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
+        </div>
+        <div class="filter-controls">
+          <select [(ngModel)]="courseFilter" (change)="onSearch()" class="filter-input select-input">
+            <option value="">All Courses</option>
+            @for (c of courses; track c.courseId) {
+              <option [value]="c.courseId">{{ c.courseCode }} - {{ c.courseName }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (loading) {
+        <div class="loading-wrapper">
+          <div class="spinner"></div>
+          <p>Loading course files...</p>
+        </div>
+      } @else {
+        @if (materials.length === 0) {
+          <div class="empty-state-card">
+            <div class="empty-icon">📁</div>
+            <h2>No Uploaded Materials</h2>
+            <p>You have not published any files or lecture roadmap materials for this semester yet.</p>
+          </div>
+        } @else {
+          <div class="materials-grid">
+            @for (m of materials; track m.materialId) {
+              <div class="material-card">
+                <div class="card-file-header">
+                  <div class="icon-bubble">
+                    <span class="file-icon-large">📄</span>
+                  </div>
+                  <span class="course-code-tag font-semibold">{{ m.courseCode }}</span>
+                </div>
+
+                <div class="card-file-body">
+                  <h3 class="material-title font-semibold">{{ m.title }}</h3>
+                  
+                  <div class="file-metadata">
+                    <span class="filename-lbl font-semibold">{{ m.fileName }}</span>
+                  </div>
+                </div>
+
+                <div class="card-file-footer">
+                  <button (click)="downloadMaterial(m.materialId, m.fileName)" class="action-link download-btn" title="Download Material" style="border: 1px solid var(--color-primary); background: transparent; font-family: inherit; cursor: pointer;">
+                    📥 Download
+                  </button>
+                  <button (click)="deleteMaterial(m.materialId)" class="action-link delete-btn" title="Delete Material">
+                    🗑 Delete
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+
+  </div>
+</div>
+
+<!-- Upload Modal -->
+@if (showModal) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Upload New Material</h3>
+        <button (click)="closeModal()" class="close-btn">✖</button>
+      </div>
+
+      <form (submit)="uploadMaterial(); $event.preventDefault();" class="modal-form">
+        @if (error) {
+          <div class="alert error" style="margin-bottom: 12px;">{{ error }}</div>
+        }
+
+        <div class="form-group">
+          <label class="form-lbl">Select Course</label>
+          <select [(ngModel)]="selectedCourseId" name="courseSelect" class="form-control" required>
+            @for (c of courses; track c.courseId) {
+              <option [value]="c.courseId">{{ c.courseCode }} - {{ c.courseName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-lbl">Material Title</label>
+          <input 
+            type="text" 
+            [(ngModel)]="materialTitle" 
+            name="title" 
+            class="form-control" 
+            placeholder="e.g. Lecture 4: BST Operations" 
+            required 
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-lbl">Attachment File</label>
+          <div class="drag-drop-zone">
+            <input 
+              type="file" 
+              (change)="onFileSelected($event)" 
+              class="file-input-hidden" 
+              id="fileUpload" 
+              required
+            />
+            <label for="fileUpload" class="drop-zone-label">
+              <span class="upload-icon">📤</span>
+              <span class="upload-text">
+                {{ selectedFile ? selectedFile.name : 'Click to browse files' }}
+              </span>
+              <span class="upload-subtext">Max size 25MB (PDF, DOCX, ZIP)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeModal()" class="btn btn-outline" style="border: 1px solid var(--color-primary); background: transparent; font-family: inherit; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; color: var(--color-primary);">Cancel</button>
+          <button type="submit" [disabled]="uploading" class="btn btn-primary" style="padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; background-color: var(--color-primary); color: #ffffff; border: 1px solid var(--color-primary);">
+            {{ uploading ? 'Uploading...' : '🚀 Publish Material' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

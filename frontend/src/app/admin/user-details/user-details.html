@@ -1,0 +1,410 @@
+<div class="details-container">
+  <!-- Back Button & Page Title -->
+  <div class="back-nav">
+    <a routerLink="/admin/users" class="back-link">
+      <svg class="back-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
+      </svg>
+      Back to Account Management
+    </a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Compiling 360-degree user profile dashboard...</p>
+    </div>
+  } @else if (error) {
+    <div class="error-banner">
+      <span>{{ error }}</span>
+    </div>
+  } @else if (user) {
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+      <div class="user-meta-summary">
+        <div class="avatar-placeholder">
+          {{ user.username.substring(0, 2) | uppercase }}
+        </div>
+        <div class="user-titles">
+          <h1>{{ user.username }}</h1>
+          <div class="meta-tags">
+            <span class="role-tag" [class]="user.role | lowercase">{{ user.role }}</span>
+            <span class="status-badge" [class.enabled]="user.enabled" [class.disabled]="!user.enabled">
+              {{ user.enabled ? 'Active' : 'Disabled' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Panel -->
+      <div class="quick-actions">
+        <button (click)="openEdit()" class="action-btn secondary-btn">
+          Edit Account
+        </button>
+        <button (click)="toggleEnable()" class="action-btn" [class.danger-btn]="user.enabled" [class.success-btn]="!user.enabled">
+          {{ user.enabled ? 'Disable Account' : 'Enable Account' }}
+        </button>
+        <button (click)="resetPassword()" class="action-btn warning-btn">
+          Forced Password Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid Dashboard layout -->
+    <div class="dashboard-grid">
+      <!-- LEFT SECTION: Academic/Teaching Profile Details -->
+      <section class="grid-left-col">
+        
+        <!-- STUDENT PROFILE INFO -->
+        @if (user.role === 'STUDENT' && studentProfile) {
+          <div class="card details-card">
+            <h3>Academic Profile</h3>
+            <div class="details-list">
+              <div class="details-row">
+                <span class="lbl">Registration Number</span>
+                <span class="val font-semibold">{{ studentProfile.registrationNumber }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Full Name</span>
+                <span class="val">{{ studentProfile.fullName }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Program / Course</span>
+                <span class="val font-semibold">{{ studentProfile.program }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Academic Department</span>
+                <span class="val">{{ studentProfile.department }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Phone Number</span>
+                <span class="val">{{ studentProfile.phoneNumber }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">System Email</span>
+                <span class="val">{{ user.email }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card list-card">
+            <h3>Enrolled Courses ({{ courses.length }})</h3>
+            @if (courses.length === 0) {
+              <p class="empty-list-txt">Student is not enrolled in any academic courses.</p>
+            } @else {
+              <div class="courses-list">
+                @for (c of courses; track c.courseId) {
+                  <div class="course-item">
+                    <div>
+                      <span class="course-code">{{ c.courseCode || 'Course' }}</span>
+                      <p class="course-name">{{ c.courseName }}</p>
+                      <p class="professor-name-lbl" style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Prof. {{ c.professorName }}</p>
+                      <div class="progress-details" style="font-size: 11px; color: var(--color-primary); margin-top: 4px; font-weight: 500;">
+                        Tasks: {{ c.submittedAssignments }}/{{ c.totalAssignments }} Completed ({{ c.pendingAssignments }} Pending)
+                      </div>
+                    </div>
+                    <span class="enrollment-status" [class]="c.enrollmentStatus | lowercase">{{ c.enrollmentStatus }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- PROFESSOR PROFILE INFO -->
+        @if (user.role === 'PROFESSOR' && professorProfile) {
+          <div class="card details-card">
+            <h3>Professor Profile</h3>
+            <div class="details-list">
+              <div class="details-row">
+                <span class="lbl">Employee Code</span>
+                <span class="val font-semibold">{{ professorProfile.employeeCode }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Full Name</span>
+                <span class="val">{{ professorProfile.fullName }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Designation</span>
+                <span class="val font-semibold">{{ professorProfile.designation }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Academic Department</span>
+                <span class="val">{{ professorProfile.department }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">System Email</span>
+                <span class="val">{{ user.email }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card list-card">
+            <h3>Assigned Courses ({{ professorCourses.length }})</h3>
+            @if (professorCourses.length === 0) {
+              <p class="empty-list-txt">Professor is not assigned to any courses.</p>
+            } @else {
+              <div class="courses-list">
+                @for (c of professorCourses; track c.courseId) {
+                  <div class="course-item">
+                    <div>
+                      <span class="course-code">{{ c.courseCode || 'Course' }}</span>
+                      <p class="course-name">{{ c.courseName }}</p>
+                      <div class="progress-details" style="font-size: 11px; color: var(--color-primary); margin-top: 4px; font-weight: 500;">
+                        Created Assignments: {{ c.totalAssignments }}
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ADMIN STAFF PROFILE INFO -->
+        @if (user.role === 'ADMIN' && adminStaffProfile) {
+          <div class="card details-card">
+            <h3>Administrative Profile</h3>
+            <div class="details-list">
+              <div class="details-row">
+                <span class="lbl">Employee Code</span>
+                <span class="val font-semibold">{{ adminStaffProfile.employeeCode }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Designation</span>
+                <span class="val font-semibold">{{ adminStaffProfile.designation }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">Department</span>
+                <span class="val">{{ adminStaffProfile.department }}</span>
+              </div>
+              <div class="details-row">
+                <span class="lbl">System Email</span>
+                <span class="val">{{ user.email }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+      </section>
+
+      <!-- RIGHT SECTION: Performance charts, tasks tables, and login timelines -->
+      <section class="grid-right-col">
+
+        <!-- STUDENT STATS AND ASSIGNMENTS SUMMARY -->
+        @if (user.role === 'STUDENT') {
+          <!-- Stats Summary Grid -->
+          <div class="stats-counters-grid">
+            <div class="stat-counter-card blue">
+              <span class="stat-lbl">Total Tasks</span>
+              <span class="stat-num">{{ studentStats.totalAssignments }}</span>
+            </div>
+            <div class="stat-counter-card green">
+              <span class="stat-lbl">Completed</span>
+              <span class="stat-num">{{ studentStats.completedAssignments }}</span>
+            </div>
+            <div class="stat-counter-card orange">
+              <span class="stat-lbl">Pending Submission</span>
+              <span class="stat-num">{{ studentStats.pendingAssignments }}</span>
+            </div>
+            <div class="stat-counter-card red">
+              <span class="stat-lbl">Overdue</span>
+              <span class="stat-num">{{ studentStats.overdueAssignments }}</span>
+            </div>
+            <div class="stat-counter-card teal">
+              <span class="stat-lbl">Graded</span>
+              <span class="stat-num">{{ studentStats.gradedAssignments }}</span>
+            </div>
+            <div class="stat-counter-card purple">
+              <span class="stat-lbl">Awaiting Grading</span>
+              <span class="stat-num">{{ studentStats.awaitingGrading }}</span>
+            </div>
+          </div>
+
+          <div class="card table-card">
+            <h3>Academic Assignments Summary</h3>
+            @if (studentAssignments.length === 0) {
+              <p class="empty-list-txt">No assignments assigned for enrolled courses.</p>
+            } @else {
+              <div class="table-container">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Assignment Title</th>
+                      <th>Course</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                      <th>Marks</th>
+                      <th>Letter Grade</th>
+                      <th>Submitted Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of studentAssignments; track a.assignmentId) {
+                      <tr>
+                        <td class="font-semibold">{{ a.assignmentTitle }}</td>
+                        <td>{{ a.courseName }}</td>
+                        <td>{{ a.dueDate | date:'mediumDate' }}</td>
+                        <td>
+                          <span class="status-tag" [class]="a.submissionStatus | lowercase">{{ a.submissionStatus }}</span>
+                        </td>
+                        <td>{{ a.marksObtained != null ? a.marksObtained : '-' }}</td>
+                        <td class="font-semibold text-center">{{ a.letterGrade || '-' }}</td>
+                        <td>{{ a.submissionDate ? (a.submissionDate | date:'mediumDate') : '-' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- PROFESSOR ASSIGNMENTS CREATED SUMMARY -->
+        @if (user.role === 'PROFESSOR') {
+          <div class="stats-counters-grid">
+            <div class="stat-counter-card blue">
+              <span class="stat-lbl">Total Courses</span>
+              <span class="stat-num">{{ professorStats.totalCourses }}</span>
+            </div>
+            <div class="stat-counter-card teal">
+              <span class="stat-lbl">Total Assignments</span>
+              <span class="stat-num">{{ professorStats.totalAssignments }}</span>
+            </div>
+            <div class="stat-counter-card green">
+              <span class="stat-lbl">Graded Tasks</span>
+              <span class="stat-num">{{ professorStats.gradedAssignments }}</span>
+            </div>
+            <div class="stat-counter-card orange">
+              <span class="stat-lbl">Awaiting Grading</span>
+              <span class="stat-num">{{ professorStats.awaitingGrading }}</span>
+            </div>
+          </div>
+
+          <div class="card table-card">
+            <h3>Created Academic Assignments & Submissions</h3>
+            @if (professorAssignments.length === 0) {
+              <p class="empty-list-txt">Professor has not created any assignments.</p>
+            } @else {
+              <div class="table-container">
+                <table class="dashboard-table">
+                  <thead>
+                    <tr>
+                      <th>Assignment Title</th>
+                      <th>Course Name</th>
+                      <th>Due Date</th>
+                      <th>Submission Status Summary</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of professorAssignments; track a.assignmentId) {
+                      <tr>
+                        <td class="font-semibold">{{ a.assignmentTitle }}</td>
+                        <td>{{ a.courseName }}</td>
+                        <td>{{ a.dueDate | date:'mediumDate' }}</td>
+                        <td class="font-semibold" style="color: var(--color-primary);">{{ a.submissionStatus }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+      </section>
+    </div>
+  }
+
+  <!-- Account Edit Modal Overlay -->
+  @if (showEditModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>Edit User Account Settings</h2>
+          <button (click)="closeEdit()" class="close-modal-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (editFormError) {
+            <div class="modal-error-banner">
+              {{ editFormError }}
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="editUsername">Username</label>
+            <input
+              type="text"
+              id="editUsername"
+              [(ngModel)]="editUsername"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="editEmail">Email Address</label>
+            <input
+              type="email"
+              id="editEmail"
+              [(ngModel)]="editEmail"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeEdit()" class="btn-secondary">Cancel</button>
+          <button (click)="saveEdit()" [disabled]="editFormSaving" class="btn-primary">
+            {{ editFormSaving ? 'Saving Changes...' : 'Save Settings' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Forced Password Reset Success Modal -->
+  @if (showPasswordModal) {
+    <div class="modal-overlay">
+      <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; color: #d97706;">
+            🔑 Forced Password Reset
+          </h2>
+          <button (click)="closePasswordModal()" class="close-modal-btn">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding-top: 12px; display: flex; flex-direction: column; gap: 16px;">
+          <p style="margin: 0; font-size: 14px; color: var(--color-text-muted); line-height: 1.5;">
+            Temporary password generated successfully. Please provide this secure credential to the user:
+          </p>
+
+          <div class="password-display-wrapper" style="display: flex; gap: 8px; align-items: center; background-color: #f8fafc; border: 1px dashed #cbd5e1; padding: 12px 16px; border-radius: 6px; position: relative;">
+            <span style="font-family: monospace; font-size: 18px; font-weight: 700; color: var(--color-text); letter-spacing: 1px; flex: 1;">
+              {{ generatedPassword }}
+            </span>
+            
+            <button (click)="copyPassword()" class="action-btn" style="padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 4px; display: flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid var(--color-primary); background: transparent; color: var(--color-primary);">
+              @if (copied) {
+                <span>✓ Copied</span>
+              } @else {
+                <span>📋 Copy</span>
+              }
+            </button>
+          </div>
+
+          <p style="margin: 0; font-size: 12px; color: #dc2626; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            ⚠️ The user will be required to change this password on next login.
+          </p>
+        </div>
+
+        <div class="modal-footer" style="border-top: none; padding-top: 0; margin-top: 8px;">
+          <button (click)="closePasswordModal()" class="btn-primary" style="width: 100%; justify-content: center; text-align: center; border: none; padding: 10px 0; border-radius: 6px; cursor: pointer;">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

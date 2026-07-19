@@ -1,0 +1,81 @@
+<div class="transcript-container">
+  <div class="page-header">
+    <h1>Academic Record Transcript</h1>
+    <p class="subtitle">View your cumulative grade point average (CGPA), registered courses, and official evaluations.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving academic transcript...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (record && !error) {
+      <!-- Summary metrics banner row -->
+      <section class="summary-stats-section">
+        <div class="summary-stat-card blue">
+          <span class="lbl">Cumulative GPA (CGPA)</span>
+          <span class="val font-semibold">{{ record.cgpa != null ? (record.cgpa | number:'1.2-2') : '0.00' }}</span>
+        </div>
+        <div class="summary-stat-card purple">
+          <span class="lbl">Total Registered Courses</span>
+          <span class="val font-semibold">{{ record.totalCourses || 0 }} Courses</span>
+        </div>
+      </section>
+
+
+
+      <!-- Transcript Course Records Table Card -->
+      <div class="transcript-card">
+        <h2 class="card-title">Academic Records Course Summary</h2>
+        
+        @if (!filteredCourses || filteredCourses.length === 0) {
+          <p class="empty-list-txt">No completed course records found on this transcript matching the filters.</p>
+        } @else {
+          <div class="table-container">
+            <table class="transcript-table">
+              <thead>
+                <tr>
+                  <th>Course Name</th>
+                  <th>Academic Period</th>
+                  <th>Instructor / Professor</th>
+                  <th>Enrollment Status</th>
+                  <th>Average Marks</th>
+                  <th>Average Percentage</th>
+                  <th>Final Letter Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of filteredCourses; track c.courseId) {
+                  <tr>
+                    <td class="font-semibold text-main">{{ c.courseName }}</td>
+                    <td>{{ c.academicYear }} ({{ c.academicHalf }})</td>
+                    <td>{{ c.professorName || 'Not Assigned' }}</td>
+                    <td>
+                      <span class="status-indicator" [class]="c.enrollmentStatus | lowercase">
+                        {{ c.enrollmentStatus }}
+                      </span>
+                    </td>
+                    <td>{{ c.averageMarks != null ? (c.averageMarks | number:'1.1-2') : '-' }}</td>
+                    <td>{{ c.averagePercentage != null ? (c.averagePercentage | number:'1.1-2') + '%' : '-' }}</td>
+                    <td>
+                      <span class="letter-badge" [class]="c.finalGrade ? c.finalGrade.substring(0, 1).toLowerCase() : 'f'">
+                        {{ c.finalGrade || 'N/A' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

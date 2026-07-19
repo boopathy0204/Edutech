@@ -1,0 +1,118 @@
+<div class="assignment-details-container">
+  <!-- Navigation Header -->
+  <div class="back-nav">
+    <a [routerLink]="['/courses', courseId, 'assignments']" class="back-link">&larr; Back to Assignments List</a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving assignment details...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (assignment && !error) {
+      <div class="details-layout-grid">
+        
+        <!-- COLUMN 1: Instructions & Details -->
+        <div class="left-details-col">
+          <div class="details-card">
+            <span class="assignment-tag font-semibold">Course Assignment</span>
+            <h1 class="assignment-title">{{ assignment.title || assignment.assignmentTitle }}</h1>
+            
+            <div class="meta-stats-row">
+              <div class="stat-item">
+                <span class="lbl">Due Date</span>
+                <span class="val font-semibold due-text">{{ assignment.dueDate | date:'medium' }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="lbl">max Marks</span>
+                <span class="val font-semibold">{{ assignment.maxMarks }} Marks</span>
+              </div>
+            </div>
+
+            <div class="syllabus-section">
+              <h3 class="section-title">Instructions & Description</h3>
+              <p class="instruction-desc">{{ assignment.description || 'No instruction details provided.' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMN 2: Submission Status & Feedback -->
+        <div class="right-sidebar-col">
+          
+          <!-- Submission status card -->
+          <div class="details-card status-card">
+            <h3 class="card-title">Submission Status</h3>
+            
+            @if (!submission) {
+              <div class="status-box not-submitted">
+                <span class="badge status-lbl">Not Submitted</span>
+                <p class="status-desc">You have not uploaded any files for this assignment yet.</p>
+                
+                <a [routerLink]="['/courses', courseId, 'assignments', assignmentId, 'submit']" class="submit-action-btn text-decoration-none">
+                  📤 Submit Assignment
+                </a>
+              </div>
+            } @else {
+              <!-- Submission Details -->
+               <div class="status-box submitted">
+                <span class="badge status-lbl" [class.graded]="submission.status === 'GRADED'">
+                  {{ submission.status === 'GRADED' ? 'Graded' : 'Submitted' }}
+                </span>
+                
+                <div class="submission-meta">
+                  <div class="meta-row">
+                    <span class="lbl">Submitted On</span>
+                    <span class="val font-semibold">{{ submission.submittedAt | date:'medium' }}</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="lbl">Attachment File</span>
+                    <button
+                      (click)="downloadSubmission(submission.submissionId, submission.fileName)"
+                      class="download-btn-link val file-link font-semibold"
+                      title="Download File"
+                      style="background: none; border: none; color: var(--color-primary); cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit; text-align: left;">
+                      📄 Download Submission
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Graded feedback -->
+                @if (submission.status === 'GRADED' && submission.grade) {
+                  <div class="grade-feedback-box">
+                    <h4 class="feedback-title">Instructor Feedback</h4>
+                    
+                    <div class="feedback-stats">
+                      <div class="score-pill">
+                        <span class="score-num font-semibold">{{ submission.grade.marks }}</span>
+                        <span class="score-denom">/ {{ assignment.maxMarks }}</span>
+                      </div>
+                    </div>
+
+                    @if (submission.grade.feedback) {
+                      <p class="remarks-text">"{{ submission.grade.feedback }}"</p>
+                    } @else {
+                      <p class="remarks-text italic">No feedback remarks entered by professor.</p>
+                    }
+                  </div>
+                } @else {
+                  <div class="awaiting-grading-box">
+                    <p class="waiting-txt">🕒 Awaiting grading from your instructor.</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+
+      </div>
+    }
+  }
+</div>

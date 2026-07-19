@@ -1,0 +1,230 @@
+.submit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.back-nav {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}
+
+.submit-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+.subtitle strong {
+  color: var(--color-text-main);
+}
+
+.submit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* File uploader trigger styles */
+.file-uploader-box {
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  background-color: #f8fafc;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.file-uploader-box:hover {
+  border-color: var(--color-primary);
+}
+
+.file-uploader-box.file-selected {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.upload-trigger-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.upload-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.prompt-text {
+  font-size: 14px;
+  color: var(--color-text-main);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.supported-text {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.file-info {
+  font-size: 14px;
+  color: #15803d;
+  margin-bottom: 2px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: 11px;
+  color: #166534;
+}
+
+/* Remarks comments box */
+.form-control {
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  outline: none;
+  background-color: var(--color-card-bg);
+  color: var(--color-text-main);
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+}
+
+/* Buttons action footer */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
+  margin-top: 8px;
+}
+
+.cancel-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.cancel-btn:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.submit-btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Alert styles */
+.alert {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+.alert.error {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #991b1b;
+}
+
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.font-semibold { font-weight: 600; }

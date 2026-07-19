@@ -1,0 +1,141 @@
+<div class="details-container">
+  <!-- Back Link navigation -->
+  <div class="back-nav">
+    <a routerLink="/courses" class="back-link">&larr; Back to My Courses</a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving course syllabus...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (course && !error) {
+      <!-- Course Title Banner -->
+      <div class="course-header-banner">
+        <div class="banner-content">
+          <span class="course-code-tag">{{ course.courseCode }}</span>
+          <h1>{{ course.courseName }}</h1>
+          <p class="banner-subtitle">
+            Credits: <strong>{{ course.credits }} Cr</strong> &bull; 
+            Professor: <strong>{{ course.professorName }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Layout Grid -->
+      <div class="details-layout-grid">
+        
+        <!-- Left Column: Syllabus details, Materials list, Assignments list -->
+        <div class="main-details-col">
+          
+          <!-- Course syllabus / description card -->
+          <div class="details-card">
+            <h2 class="card-title">Course Description & Syllabus</h2>
+            <p class="syllabus-text">{{ course.description || 'No description available for this course.' }}</p>
+          </div>
+
+          <!-- Course Materials Card -->
+          <div class="details-card">
+            <div class="header-with-action">
+              <h2 class="card-title">Latest Course Materials</h2>
+              <a [routerLink]="['/courses', courseId, 'materials']" class="card-action-link">View All Materials &rarr;</a>
+            </div>
+
+            @if (materials.length === 0) {
+              <p class="empty-list-text">No materials uploaded for this course yet.</p>
+            } @else {
+              <div class="materials-list">
+                @for (m of materials.slice(0, 3); track m.materialId) {
+                  <div class="material-row-item">
+                    <div class="file-icon-info">
+                      <span class="file-icon">📄</span>
+                      <div>
+                        <span class="file-title font-semibold">{{ m.title }}</span>
+                        <p class="file-meta">Uploaded on {{ m.uploadedAt | date:'mediumDate' }}</p>
+                      </div>
+                    </div>
+                    <button (click)="downloadMaterial(m.materialId, m.fileName)" class="download-icon-btn" title="Download Material" style="background: transparent; border: none; cursor: pointer; font-family: inherit;">
+                      📥 Download
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Course Assignments Card -->
+          <div class="details-card">
+            <div class="header-with-action">
+              <h2 class="card-title">Course Assignments</h2>
+              <a [routerLink]="['/courses', courseId, 'assignments']" class="card-action-link">View All Assignments &rarr;</a>
+            </div>
+
+            @if (assignments.length === 0) {
+              <p class="empty-list-text">No assignments posted for this course yet.</p>
+            } @else {
+              <div class="assignments-list">
+                @for (a of assignments.slice(0, 3); track a.assignmentId) {
+                  <div class="assignment-row-item">
+                    <div class="assignment-info">
+                      <span class="title font-semibold">{{ a.assignmentTitle || a.title }}</span>
+                      <p class="due-date">Due: {{ a.dueDate | date:'mediumDate' }} &bull; Max Marks: {{ a.maxMarks }}</p>
+                    </div>
+                    <a [routerLink]="['/courses', courseId, 'assignments', a.assignmentId]" class="details-link-btn">
+                      View Details &rarr;
+                    </a>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Right Column: Professor & Academic stats sidebar -->
+        <div class="sidebar-details-col">
+          <div class="details-card instructor-card">
+            <h3 class="sidebar-title">Instructor Details</h3>
+            <div class="instructor-avatar">
+              {{ (course.professorName ? course.professorName.substring(0, 1) : 'P').toUpperCase() }}
+            </div>
+            <h4 class="instructor-name">{{ course.professorName || 'Professor' }}</h4>
+            <p class="instructor-role">Teaching Faculty</p>
+            <div class="meta-details">
+              <div class="detail-row">
+                <span class="lbl">Credits Value</span>
+                <span class="val font-semibold">{{ course.credits }} Credits</span>
+              </div>
+              <div class="detail-row">
+                <span class="lbl">Course ID</span>
+                <span class="val font-semibold">#{{ course.courseId }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Shortcuts -->
+          <div class="details-card shortcuts-card">
+            <h3 class="sidebar-title">Quick Navigation</h3>
+            <div class="shortcut-links">
+              <a [routerLink]="['/courses', courseId, 'materials']" class="shortcut-btn">
+                <span>📚 Course Materials</span>
+                <span class="arrow">&rarr;</span>
+              </a>
+              <a [routerLink]="['/courses', courseId, 'assignments']" class="shortcut-btn">
+                <span>✏ Assignments list</span>
+                <span class="arrow">&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    }
+  }
+</div>

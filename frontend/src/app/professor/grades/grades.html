@@ -1,0 +1,98 @@
+<div class="grades-container">
+  <div class="page-header">
+    <h1>Grade Center Portal</h1>
+    <p class="subtitle">Oversee class marks, percentage scales, letter marks, and comments.</p>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+
+  <!-- Filters Panel -->
+  <div class="filters-card">
+    <div class="search-box" style="display: flex; gap: 8px; align-items: center; flex: 1;">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (keyup.enter)="applySearch()" 
+        placeholder="Search student name or assignment..." 
+        class="filter-input search-input"
+      />
+      <button (click)="applySearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center;">Search</button>
+    </div>
+    <div class="filter-controls">
+      <select [(ngModel)]="selectedCourseFilter" (change)="onFilterChange()" class="filter-input select-input">
+        <option value="">All Courses</option>
+        @for (c of courses; track c.courseId) {
+          <option [value]="c.courseId">{{ c.courseCode }} - {{ c.courseName }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Grades Data Table Card -->
+  @if (loading) {
+    <div class="skeleton-wrapper">
+      <div class="skeleton-row" style="width: 100%;"></div>
+      <div class="skeleton-row" style="width: 90%;"></div>
+    </div>
+  } @else {
+    @if (filteredGrades.length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📊</div>
+        <h2>No Grades Found</h2>
+        <p>No graded student attempts found matching the selected search filters.</p>
+      </div>
+    } @else {
+      <div class="table-card">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student Details</th>
+                <th>Assignment Task</th>
+                <th>Score Marks</th>
+                <th>Percentage</th>
+                <th>Letter Grade</th>
+                <th>Instructor Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (g of filteredGrades; track g.gradeId) {
+                <tr>
+                  <td>
+                    <div class="student-info-col">
+                      <span class="font-semibold">{{ g.studentName }}</span>
+                      <span class="reg-subtxt">{{ g.regNumber }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="assignment-info-col">
+                      <span class="font-semibold">{{ g.assignmentTitle }}</span>
+                      @if (g.courseCode) {
+                        <span class="course-code-subtxt">{{ g.courseCode }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="font-semibold">{{ g.marks }} / {{ g.maxMarks }}</td>
+                  <td>
+                    <span class="percentage-badge font-semibold">{{ g.percentage | number:'1.0-1' }}%</span>
+                  </td>
+                  <td>
+                    <span class="letter-grade-pill font-semibold" [class]="g.letterGrade | lowercase">
+                      {{ g.letterGrade }}
+                    </span>
+                  </td>
+                  <td class="feedback-cell" [title]="g.feedback">
+                    {{ g.feedback || 'No comments left.' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+      </div>
+    </div>
+  }
+}
+</div>

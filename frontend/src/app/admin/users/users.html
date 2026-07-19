@@ -1,0 +1,357 @@
+<div class="users-container">
+  <div class="page-header">
+    <div>
+      <h1>Manage User Accounts</h1>
+      <p class="subtitle">Create and manage authentication logins for students, professors, and administrators.</p>
+    </div>
+    <div class="header-actions">
+      <button (click)="openImportCard()" class="import-btn">
+        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Bulk Import Excel
+      </button>
+      <button (click)="openCreateModal()" class="create-btn">
+        <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Create User Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Bulk Importer card overlay/panel -->
+  @if (showImportCard) {
+    <div class="importer-card">
+      <div class="importer-header">
+        <h3>User Credentials Bulk Importer</h3>
+        <button (click)="closeImport()" class="close-importer-btn" aria-label="Close panel">&times;</button>
+      </div>
+
+      <div class="importer-body">
+        @if (importError) {
+          <div class="alert-banner error">
+            {{ importError }}
+          </div>
+        }
+
+        <p class="importer-instructions">
+          Select a Excel spreadsheet (<code>.xlsx</code>, <code>.xls</code>). Ensure the sheet contains columns in order:
+          <strong>Name</strong>, <strong>Email</strong>, and <strong>Role</strong> (STUDENT, PROFESSOR, ADMIN).
+          Usernames and secure temporary passwords will be generated automatically.
+        </p>
+
+        <div class="file-upload-zone">
+          <input
+            type="file"
+            id="fileInput"
+            (change)="onFileSelected($event)"
+            accept=".csv, .xlsx, .xls"
+            class="file-input-hidden"
+          />
+          <label for="fileInput" class="file-upload-label">
+            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <polyline points="9 15 12 12 15 15"/>
+            </svg>
+            @if (selectedFile) {
+              <span class="file-name">{{ selectedFile.name }}</span>
+            } @else {
+              <span class="upload-prompt">Click to browse CSV or Excel files</span>
+            }
+          </label>
+        </div>
+
+        @if (importSummary) {
+          <div class="import-summary-container">
+            <div class="summary-results-header">
+              <h4>Import Summary Results</h4>
+              @if (importSummary.successCount > 0) {
+                <button (click)="exportCredentials()" class="export-btn">
+                  <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  Export Credentials CSV
+                </button>
+              }
+            </div>
+
+            <div class="import-stats-grid">
+              <div class="import-stat success">
+                <span class="stat-lbl">Created Users</span>
+                <span class="stat-val">{{ importSummary.successCount }}</span>
+              </div>
+              <div class="import-stat failure">
+                <span class="stat-lbl">Failed Rows</span>
+                <span class="stat-val">{{ importSummary.failureCount }}</span>
+              </div>
+              <div class="import-stat total">
+                <span class="stat-lbl">Total Processed</span>
+                <span class="stat-val">{{ importSummary.totalRows }}</span>
+              </div>
+            </div>
+
+            <!-- List generated user logins details -->
+            <div class="results-table-wrapper">
+              <h5>Newly Registered Accounts Logins:</h5>
+              <div class="table-container compact">
+                <table class="users-table compact">
+                  <thead>
+                    <tr>
+                      <th>Row</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Username</th>
+                      <th>Temp Password</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (r of importSummary.results; track r.rowNumber) {
+                      <tr>
+                        <td>{{ r.rowNumber }}</td>
+                        <td>{{ r.name || '-' }}</td>
+                        <td>{{ r.email || '-' }}</td>
+                        <td class="font-semibold">{{ r.generatedUsername || '-' }}</td>
+                        <td>
+                          @if (r.success) {
+                            <code class="password-code">{{ r.generatedPassword }}</code>
+                          } @else {
+                            -
+                          }
+                        </td>
+                        <td>{{ r.role || '-' }}</td>
+                        <td>
+                          <span class="status-tag" [class.success]="r.success" [class.failure]="!r.success">
+                            {{ r.success ? 'Success' : r.message }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="importer-footer">
+        <button (click)="closeImport()" class="btn-secondary">Close Importer</button>
+        <button (click)="uploadFile()" [disabled]="importLoading || !selectedFile" class="btn-primary">
+          @if (importLoading) {
+            Uploading & Creating Accounts...
+          } @else {
+            Execute Bulk Import
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Temporary Password Notification Alert -->
+  @if (showTempPasswordBanner) {
+    <div class="temp-password-banner">
+      <div class="banner-content">
+        <svg class="success-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div class="banner-details">
+          <h3>User Account Created Successfully!</h3>
+          <p>Please note the temporary login credentials for <strong>{{ tempPasswordUser }}</strong> below. They are shown only once:</p>
+          <div class="credential-box">
+            <span class="cred-label">Temporary Password:</span>
+            <code class="password-code">{{ tempPasswordValue }}</code>
+          </div>
+        </div>
+      </div>
+      <button (click)="dismissTempBanner()" class="close-banner-btn" aria-label="Dismiss banner">&times;</button>
+    </div>
+  }
+
+  <!-- Error display -->
+  @if (error && !loading) {
+    <div class="error-banner">
+      <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-bar" style="display: flex; gap: 12px; align-items: center;">
+    <div class="search-input-wrapper" style="display: flex; align-items: center; gap: 8px; flex: 1;">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search by username or email..."
+        class="search-input"
+        style="flex: 1;"
+      />
+      <button (click)="onSearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center;">Search</button>
+    </div>
+
+    <div class="filter-dropdown-wrapper">
+      <select
+        [(ngModel)]="selectedRole"
+        (change)="onSearch()"
+        class="role-select"
+      >
+        <option value="">All Roles</option>
+        <option value="ADMIN">ADMIN</option>
+        <option value="PROFESSOR">PROFESSOR</option>
+        <option value="STUDENT">STUDENT</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- User list table -->
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-wrapper">
+        <div class="spinner"></div>
+        <p>Loading accounts list...</p>
+      </div>
+    } @else {
+      @if (filteredUsers.length === 0) {
+        <div class="empty-state">
+          <p>No user accounts match your active search or filters.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email Address</th>
+                <th>Access Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (u of filteredUsers; track u.userId) {
+                <tr>
+                  <td class="font-semibold">{{ u.username }}</td>
+                  <td>{{ u.email }}</td>
+                  <td>
+                    <span class="role-badge" [class]="u.role | lowercase">
+                      {{ u.role }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <a [routerLink]="['/admin/users', u.userId, 'details']" class="action-btn edit-btn" style="text-decoration: none;" title="View user details">
+                        View Details
+                      </a>
+                      <button (click)="openEditModal(u)" class="action-btn edit-btn" title="Edit account">
+                        Edit
+                      </button>
+                      @if (u.userId !== loggedUserId) {
+                        <button (click)="deleteUser(u.userId)" class="action-btn delete-btn" title="Delete account">
+                          Delete
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create/Edit Modal Popup Overlay -->
+  @if (showModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>{{ modalTitle }}</h2>
+          <button (click)="closeModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (formError) {
+            <div class="modal-error-banner">
+              {{ formError }}
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="username">Username (Optional)</label>
+            <input
+              type="text"
+              id="username"
+              [(ngModel)]="formUsername"
+              placeholder="e.g. johndoe (leave blank to auto-generate from email)"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="formEmail"
+              placeholder="e.g. johndoe@university.edu"
+              class="form-control"
+            />
+          </div>
+
+          <!-- Password field: only visible on Create -->
+          @if (!isEditMode) {
+            <div class="form-group">
+              <label for="password">Password (Optional)</label>
+              <input
+                type="password"
+                id="password"
+                [(ngModel)]="formPassword"
+                placeholder="Leave blank to auto-generate temporary password"
+                class="form-control"
+              />
+              <span class="help-text">If left blank, a random, secure temporary password will be shown upon creation.</span>
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="role">User Role</label>
+            <select
+              id="role"
+              [(ngModel)]="formRole"
+              class="form-control"
+            >
+              <option value="" disabled selected>Select Role</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="PROFESSOR">PROFESSOR</option>
+              <option value="STUDENT">STUDENT</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeModal()" class="btn-secondary">Cancel</button>
+          <button (click)="saveUser()" class="btn-primary">Save User</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

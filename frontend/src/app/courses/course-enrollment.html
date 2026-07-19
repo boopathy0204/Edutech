@@ -1,0 +1,235 @@
+<div class="enrollment-container">
+  <div class="page-header">
+    <h1>Course Registration</h1>
+    <p class="subtitle">Search and enroll in available courses to add them to your academic schedule.</p>
+  </div>
+
+  <!-- Search Filter Panel -->
+  <div class="search-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px;">
+    <div style="display: flex; gap: 12px; width: 100%;">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keydown.enter)="applySearch()"
+        placeholder="Search by course name or code..."
+        class="search-input"
+        style="flex: 1; max-width: none; border: 1px solid var(--color-border); border-radius: 6px; padding: 8px 12px;"
+      />
+      <button (click)="applySearch()" class="search-btn" style="background-color: var(--color-primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
+      @if (searchQuery || filterCredits || filterProfessor) {
+        <button (click)="clearSearch()" class="clear-btn" style="background: transparent; border: 1px solid var(--color-border); padding: 8px 16px; border-radius: 6px; cursor: pointer; color: var(--color-text-muted);">Clear</button>
+      }
+    </div>
+    
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; font-weight: 600; color: var(--color-text-muted);">Credits:</span>
+        <select [(ngModel)]="filterCredits" (change)="applySearch()" style="padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 6px; outline: none; font-size: 13px;">
+          <option [ngValue]="null">All Credits</option>
+          <option [ngValue]="1">1 Credit</option>
+          <option [ngValue]="2">2 Credits</option>
+          <option [ngValue]="3">3 Credits</option>
+          <option [ngValue]="4">4 Credits</option>
+          <option [ngValue]="5">5 Credits</option>
+        </select>
+      </div>
+
+      @if (student) {
+        <div style="display: flex; align-items: center; gap: 8px; background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 6px 14px; border-radius: 6px;">
+          <span style="font-size: 12px; font-weight: 700; color: #1e40af;">
+            📅 Current Academic Period: {{ student.academicYear }} ({{ student.academicHalf }})
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Loading course catalog...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+    @if (success) {
+      <div class="alert success">
+        {{ success }}
+      </div>
+    }
+
+    @if (courses.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">🏫</div>
+        <h2>No Available Courses</h2>
+        <p>No courses are currently open for registration in this semester.</p>
+      </div>
+    } @else {
+      <!-- Courses list catalog grid -->
+      <div class="catalog-grid">
+        @for (c of courses; track c.courseId) {
+          <div class="catalog-card" [class.enrolled]="c.isEnrolled">
+            <div class="card-header">
+              <span class="course-code-tag">{{ c.courseCode }}</span>
+              <span class="credits-tag font-semibold">{{ c.credits }} Credits</span>
+            </div>
+            
+            <div class="card-body">
+              <h3 class="course-title" style="margin-top: 0; margin-bottom: 8px; color: var(--color-primary); cursor: pointer; text-decoration: underline;" (click)="viewCourseDetails(c)">
+                {{ c.courseName }}
+              </h3>
+              <p class="instructor-info" style="margin-bottom: 12px; font-size: 13px;">Professor: <strong>{{ c.professorName || 'Not Assigned' }}</strong></p>
+              
+              <!-- Lifecycle Details -->
+              <div class="lifecycle-meta" style="font-size: 12px; color: var(--color-text-muted); display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; background-color: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span><strong>Status:</strong></span>
+                  <span [style.background-color]="c.courseStatus === 'ACTIVE' ? '#d1fae5' : '#fef3c7'"
+                        [style.color]="c.courseStatus === 'ACTIVE' ? '#065f46' : '#d97706'"
+                        style="padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                    {{ c.courseStatus || 'UPCOMING' }}
+                  </span>
+                </div>
+                <div>
+                  <strong>Enrollment:</strong> 
+                  <span style="display: block; font-size: 11px; margin-top: 2px; color: var(--color-text-main);">
+                    {{ c.enrollmentStartDate ? (c.enrollmentStartDate | date:'mediumDate') : 'Anytime' }} - {{ c.enrollmentEndDate ? (c.enrollmentEndDate | date:'mediumDate') : 'Anytime' }}
+                  </span>
+                </div>
+                <div>
+                  <strong>Course Duration:</strong> 
+                  <span style="display: block; font-size: 11px; margin-top: 2px; color: var(--color-text-main);">
+                    {{ c.courseStartDate ? (c.courseStartDate | date:'mediumDate') : 'TBD' }} - {{ c.courseEndDate ? (c.courseEndDate | date:'mediumDate') : 'TBD' }}
+                  </span>
+                </div>
+              </div>
+
+              <p class="course-description">{{ c.description || 'No course syllabus description provided.' }}</p>
+            </div>
+            
+            <div class="card-footer">
+              @if (c.isEnrolled) {
+                <div class="enrolled-status-box">
+                  <span class="check-mark">✓</span>
+                  <span class="status-lbl font-semibold">Registered ({{ c.enrollmentStatus || 'Active' }})</span>
+                </div>
+              } @else {
+                <button
+                  (click)="enrollInCourse(c.courseId)"
+                  [disabled]="enrollingId === c.courseId"
+                  class="enroll-btn"
+                >
+                  {{ enrollingId === c.courseId ? 'Enrolling...' : 'Enroll in Course' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Course Details Modal -->
+  @if (showDetailsModal && selectedCourse) {
+    <div class="modal-backdrop" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+      <div class="modal-card" style="background: white; border-radius: 12px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); display: flex; flex-direction: column; animation: slideUp 0.2s ease-out;">
+        
+        <!-- Header -->
+        <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; background: #f8fafc; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+          <div>
+            <span style="font-size: 11px; font-weight: 700; color: var(--color-primary); background: #eff6ff; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-bottom: 6px; display: inline-block;">
+              {{ selectedCourse.courseCode }} &bull; {{ selectedCourse.credits }} Credits
+            </span>
+            <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--color-text-main);">
+              {{ selectedCourse.courseName }}
+            </h2>
+          </div>
+          <button (click)="closeDetailsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; transition: color 0.15s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
+            &times;
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body" style="padding: 24px; display: flex; flex-direction: column; gap: 20px; color: var(--color-text-main);">
+          
+          <!-- General Details -->
+          <div>
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px;">Course Syllabus & Description</h3>
+            <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: #334155; white-space: pre-line;">
+              {{ selectedCourse.description || 'No detailed syllabus or course description provided.' }}
+            </p>
+          </div>
+
+          <!-- Timeline & General Meta -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px;">
+            <div>
+              <p style="margin: 0 0 6px 0;"><strong>Professor:</strong> {{ selectedCourse.professorName || 'Not Assigned' }}</p>
+              <p style="margin: 0 0 6px 0;"><strong>Status:</strong> 
+                <span [style.background-color]="selectedCourse.courseStatus === 'ACTIVE' ? '#d1fae5' : '#fef3c7'"
+                      [style.color]="selectedCourse.courseStatus === 'ACTIVE' ? '#065f46' : '#d97706'"
+                      style="padding: 2px 6px; border-radius: 9999px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-left: 4px;">
+                  {{ selectedCourse.courseStatus || 'UPCOMING' }}
+                </span>
+              </p>
+              <p style="margin: 0;"><strong>Academic Period:</strong> {{ selectedCourse.academicYear }} ({{ selectedCourse.academicHalf }})</p>
+            </div>
+            <div>
+              <p style="margin: 0 0 6px 0;"><strong>Enrollment Period:</strong><br>
+                <span style="color: #475569;">{{ selectedCourse.enrollmentStartDate ? (selectedCourse.enrollmentStartDate | date:'mediumDate') : 'Anytime' }} - {{ selectedCourse.enrollmentEndDate ? (selectedCourse.enrollmentEndDate | date:'mediumDate') : 'Anytime' }}</span>
+              </p>
+              <p style="margin: 0;"><strong>Course Duration:</strong><br>
+                <span style="color: #475569;">{{ selectedCourse.courseStartDate ? (selectedCourse.courseStartDate | date:'mediumDate') : 'TBD' }} - {{ selectedCourse.courseEndDate ? (selectedCourse.courseEndDate | date:'mediumDate') : 'TBD' }}</span>
+              </p>
+            </div>
+          </div>
+
+            <!-- Timetable Schedule -->
+            <div>
+              <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px;">Class Timetable / Schedule</h3>
+              @if (modalScheduleList.length === 0) {
+                <p style="margin: 0; font-size: 13px; color: #64748b; font-style: italic;">No class schedules are assigned yet.</p>
+              } @else {
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                  @for (s of modalScheduleList; track s.scheduleId) {
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 14px; border-radius: 6px; font-size: 13px;">
+                      <span style="font-weight: 600; color: #166534;">📅 {{ s.dayOfWeek }}</span>
+                      <span style="color: #374151;">⏰ {{ s.startTime }} - {{ s.endTime }}</span>
+                      <span style="background: #dcfce7; color: #14532d; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 11px;">🚪 Room {{ s.roomNumber }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+          <button (click)="closeDetailsModal()" class="btn btn-outline" style="padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 6px; font-weight: 600; background: white; cursor: pointer;">
+            Close Details
+          </button>
+          @if (!selectedCourse.isEnrolled) {
+            <button
+              (click)="enrollInCourse(selectedCourse.courseId); closeDetailsModal()"
+              [disabled]="enrollingId === selectedCourse.courseId"
+              style="padding: 8px 20px; background: var(--color-primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;"
+              onmouseover="this.style.opacity='0.9'"
+              onmouseout="this.style.opacity='1'"
+            >
+              {{ enrollingId === selectedCourse.courseId ? 'Enrolling...' : 'Enroll in Course' }}
+            </button>
+          } @else {
+            <span style="padding: 8px 16px; color: #15803d; background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 6px; font-weight: 600; font-size: 13px;">
+              Already Registered
+            </span>
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+</div>

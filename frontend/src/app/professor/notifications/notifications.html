@@ -1,0 +1,62 @@
+<div class="notifications-container">
+  <div class="page-header-flex">
+    <div>
+      <h1>Portal Notifications</h1>
+      <p class="subtitle">Stay updated on class submissions, files published, and due grading deadlines.</p>
+    </div>
+    <button (click)="markAllAsRead()" class="btn btn-outline">
+      ✔ Mark All As Read
+    </button>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  @if (loading) {
+    <div class="skeleton-wrapper">
+      <div class="skeleton-row" style="width: 100%;"></div>
+      <div class="skeleton-row" style="width: 100%;"></div>
+    </div>
+  } @else {
+    @if (notificationsList.length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon">🔔</div>
+        <h2>All Caught Up!</h2>
+        <p>No new portal notifications recorded for your teaching account.</p>
+      </div>
+    } @else {
+      <div class="notifications-list">
+        @for (n of notificationsList; track n.id) {
+          <div class="notification-card" [class.unread]="!n.read">
+            <div class="notif-header">
+              <div class="icon-indicator" [class]="n.type.toLowerCase()">
+                @if (n.type === 'SUBMISSION') { 📥 }
+                @else if (n.type === 'MATERIAL') { 📄 }
+                @else if (n.type === 'DEADLINE') { 🕒 }
+                @else { 🔔 }
+              </div>
+              
+              <div class="notif-content">
+                <div class="title-row">
+                  <h3 class="notif-title font-semibold">{{ n.title }}</h3>
+                  @if (!n.read) {
+                    <span class="unread-pill font-semibold">New</span>
+                  }
+                </div>
+                <p class="notif-msg">{{ n.message }}</p>
+                <span class="notif-time">{{ n.timestamp }}</span>
+              </div>
+            </div>
+
+            @if (!n.read) {
+              <button (click)="markAsRead(n.id)" class="read-action-btn font-semibold">
+                Mark as Read
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

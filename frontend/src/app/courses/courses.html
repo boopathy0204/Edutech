@@ -1,0 +1,77 @@
+<div class="courses-container">
+  <div class="page-header">
+    <h1>My Enrolled Courses</h1>
+    <p class="subtitle">Browse academic courses, and syllabus details.</p>
+  </div>
+
+  <!-- Search Filter Panel -->
+  <div class="search-container">
+    <input
+      type="text"
+      [(ngModel)]="searchQuery"
+      (keydown.enter)="applySearch()"
+      placeholder="Search by course name or code..."
+      class="search-input"
+    />
+    <button (click)="applySearch()" class="search-btn">Search</button>
+    @if (searchQuery) {
+      <button (click)="clearSearch()" class="clear-btn">Clear</button>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving course catalogs...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (courses.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📚</div>
+        <h2>No Registered Courses</h2>
+        <p>You are not currently enrolled in any academic courses .</p>
+      </div>
+    } @else {
+      <!-- Responsive Courses Grid -->
+      <div class="courses-grid">
+        @for (c of courses; track c.courseId) {
+          <div class="course-card">
+            <div class="card-header">
+              <span class="course-code">{{ c.courseCode }}</span>
+              <span class="status-badge" [class]="c.status | lowercase">{{ c.status }}</span>
+            </div>
+            
+            <div class="card-body">
+              <h3 class="course-title">{{ c.courseName }}</h3>
+              <p class="course-desc">{{ c.description }}</p>
+              
+              <div class="meta-row">
+                <div class="meta-item">
+                  <span class="lbl">Credits</span>
+                  <span class="val font-semibold">{{ c.credits }} Cr</span>
+                </div>
+                <div class="meta-item">
+                  <span class="lbl">Professor</span>
+                  <span class="val font-semibold">{{ c.professorName }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card-footer">
+              <span class="enrollment-date">Enrolled: {{ c.enrollmentDate | date:'mediumDate' }}</span>
+              <a [routerLink]="['/courses', c.courseId]" class="details-btn">
+                View Details &rarr;
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

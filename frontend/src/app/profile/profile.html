@@ -1,0 +1,309 @@
+<div class="profile-container">
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving profile settings...</p>
+    </div>
+  } @else {
+    <!-- Main Profile Header Banner Card -->
+    <header class="profile-header-card">
+      <div class="header-profile-info">
+        <div class="profile-avatar">
+          {{ (formFirstName.substring(0, 1) + (formLastName ? formLastName.substring(0, 1) : '')).toUpperCase() }}
+        </div>
+        <div class="profile-meta">
+          <h1 class="student-name">{{ formFirstName }} {{ formLastName }}</h1>
+          @if (user?.role === 'PROFESSOR') {
+            <p class="student-reg-num">Employee Code: {{ student?.employeeCode }}</p>
+          } @else {
+            <p class="student-reg-num">Registration No: {{ student?.registrationNumber }}</p>
+          }
+          <div class="badge-row">
+            <span class="badge role-badge">{{ user?.role }}</span>
+            <span class="badge status-badge active">Active</span>
+          </div>
+          <div class="profile-meta-grid">
+            <div class="meta-item">
+              <span class="lbl">Department</span>
+              <span class="val font-semibold">{{ student?.department }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Designation' : 'Program / Degree' }}</span>
+              <span class="val font-semibold">{{ user?.role === 'PROFESSOR' ? student?.designation : student?.program }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Academic Summary Cards row -->
+    <section class="summary-cards-section">
+      <div class="summary-card">
+        <div class="card-icon blue">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="card-info">
+          <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Assigned Courses' : 'Enrolled Courses' }}</span>
+          <span class="val">{{ stats?.totalCourses || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon purple">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div class="card-info">
+          <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Assignments Created' : 'Total Assignments' }}</span>
+          <span class="val">{{ stats?.totalAssignments || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon orange">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="card-info">
+          <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Pending Grading' : 'Pending Tasks' }}</span>
+          <span class="val">{{ stats?.pendingAssignments || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="card-icon green">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <div class="card-info">
+          <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Completed Grading' : 'Graded Assignments' }}</span>
+          <span class="val">{{ stats?.gradedAssignments || 0 }}</span>
+        </div>
+      </div>
+    </section>
+
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+    @if (success) {
+      <div class="alert success">
+        {{ success }}
+      </div>
+    }
+
+    <!-- Main Sections Grid -->
+    <div class="profile-layout-grid">
+      
+      <!-- COLUMN 1: Personal & Academic Info Cards -->
+      <div class="grid-col-left">
+        
+        <!-- CARD 1: Personal Information -->
+        <div class="info-card">
+          <div class="card-header-row">
+            <h2 class="card-title">Personal Information</h2>
+            @if (!editMode) {
+              <button (click)="enterEditMode()" class="edit-link-btn">
+                <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit Profile
+              </button>
+            } @else {
+              <div class="edit-actions-row">
+                <button (click)="saveProfile()" [disabled]="saving" class="save-link-btn">
+                  ✔ Save Changes
+                </button>
+                <button (click)="cancelEdit()" class="cancel-link-btn">
+                  ✖ Cancel
+                </button>
+              </div>
+            }
+          </div>
+
+          <div class="info-list">
+            <div class="info-row">
+              <span class="lbl">First Name</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formFirstName" class="edit-input" required />
+                } @else {
+                  <span>{{ user?.role === 'PROFESSOR' ? formFirstName : student?.firstName }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="info-row">
+              <span class="lbl">Last Name</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formLastName" class="edit-input" />
+                } @else {
+                  <span>{{ user?.role === 'PROFESSOR' ? formLastName : student?.lastName || '-' }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="info-row">
+              <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Contact Number' : 'Phone Number' }}</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formPhone" class="edit-input" required />
+                } @else {
+                  <span>{{ formPhone || '-' }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: Employment / Academic Information -->
+        <div class="info-card">
+          <h2 class="card-title">{{ user?.role === 'PROFESSOR' ? 'Employment Information' : 'Academic Information' }}</h2>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Employee Code' : 'Registration Number' }}</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formRegNum" class="edit-input" required disabled />
+                } @else {
+                  <span class="font-semibold">{{ user?.role === 'PROFESSOR' ? student?.employeeCode : student?.registrationNumber }}</span>
+                }
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="lbl">Academic Department</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formDepartment" class="edit-input" required disabled />
+                } @else {
+                  <span>{{ student?.department }}</span>
+                }
+              </div>
+            </div>
+            <div class="info-row">
+              <span class="lbl">{{ user?.role === 'PROFESSOR' ? 'Designation' : 'Program / Degree' }}</span>
+              <div class="val">
+                @if (editMode) {
+                  <input type="text" [(ngModel)]="formProgram" class="edit-input" required disabled />
+                } @else {
+                  <span>{{ user?.role === 'PROFESSOR' ? student?.designation : student?.program }}</span>
+                }
+              </div>
+            </div>
+            
+            @if (user?.role === 'STUDENT') {
+              <div class="info-row">
+                <span class="lbl">Academic Year</span>
+                <span class="val font-semibold">{{ student?.academicYear || '-' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="lbl">Academic Half</span>
+                <span class="val font-semibold">{{ student?.academicHalf || '-' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMN 2: Account Login Credentials -->
+      <div class="grid-col-right">
+        
+        <!-- CARD 3: Account Information -->
+        <div class="info-card">
+          <h2 class="card-title">Account Information</h2>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="lbl">Username</span>
+              <span class="val font-semibold">@{{ user?.username }}</span>
+            </div>
+            <div class="info-row">
+              <span class="lbl">Email Address</span>
+              <span class="val">{{ user?.email }}</span>
+            </div>
+            <div class="info-row">
+              <span class="lbl">Access Role</span>
+              <span class="val font-semibold" style="color: var(--color-primary);">{{ user?.role }}</span>
+            </div>
+            <div class="info-row">
+              <span class="lbl">Account Status</span>
+              <span class="val status-tag active">{{ user?.enabled ? 'Active' : 'Disabled' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Quick Actions Bottom Bar Section -->
+    <section class="quick-actions-section">
+      <h2 class="section-title">Quick Portal Actions</h2>
+      <div class="actions-grid">
+        <button (click)="enterEditMode()" [disabled]="editMode" class="action-card-btn">
+          <span class="btn-icon">✏</span>
+          <div class="btn-desc">
+            <h4>Edit My Profile</h4>
+            <p>Update phone and contact info</p>
+          </div>
+        </button>
+
+        <a routerLink="/change-password" class="action-card-btn text-decoration-none">
+          <span class="btn-icon">🔑</span>
+          <div class="btn-desc">
+            <h4>Change Password</h4>
+            <p>Modify security login password</p>
+          </div>
+        </a>
+
+        @if (user?.role === 'PROFESSOR') {
+          <a routerLink="/professor/courses" class="action-card-btn text-decoration-none">
+            <span class="btn-icon">📚</span>
+            <div class="btn-desc">
+              <h4>My Teaching Courses</h4>
+              <p>Check course details & materials</p>
+            </div>
+          </a>
+
+          <a routerLink="/professor/grades" class="action-card-btn text-decoration-none">
+            <span class="btn-icon">🎓</span>
+            <div class="btn-desc">
+              <h4>Grade Center</h4>
+              <p>Evaluate attempts and record grades</p>
+            </div>
+          </a>
+        } @else if (user?.role === 'STUDENT') {
+          <a routerLink="/courses" class="action-card-btn text-decoration-none">
+            <span class="btn-icon">📚</span>
+            <div class="btn-desc">
+              <h4>My Enrolled Courses</h4>
+              <p>Check course details & files</p>
+            </div>
+          </a>
+
+          <a routerLink="/academic-record" class="action-card-btn text-decoration-none">
+            <span class="btn-icon">🎓</span>
+            <div class="btn-desc">
+              <h4>My Academic Records</h4>
+              <p>Browse grades and CGPA report</p>
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  }
+</div>

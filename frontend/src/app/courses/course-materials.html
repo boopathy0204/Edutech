@@ -1,0 +1,73 @@
+<div class="materials-container">
+  <!-- Navigation header -->
+  <div class="back-nav">
+    <a [routerLink]="['/courses', courseId]" class="back-link">&larr; Back to {{ course?.courseName || 'Course Details' }}</a>
+  </div>
+
+  <div class="page-header">
+    <h1>Course Materials</h1>
+    <p class="subtitle">Download lecture notes, reference slides, and resources posted by your professor.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving reference materials...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (materials.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📂</div>
+        <h2>No Uploaded Materials</h2>
+        <p>Your professor has not uploaded any study guides or lecture resources for this course yet.</p>
+      </div>
+    } @else {
+      <!-- Lecture materials card grid list -->
+      <div class="materials-card">
+        <h2 class="card-title">Shared Course Resources ({{ materials.length }})</h2>
+        
+        <div class="materials-table-container">
+          <table class="materials-table">
+            <thead>
+              <tr>
+                <th>Resource Title</th>
+                <th>File Type / Extension</th>
+                <th>Upload Date</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of materials; track m.materialId) {
+                <tr>
+                  <td>
+                    <div class="title-with-icon">
+                      <span class="icon-indicator">📄</span>
+                      <span class="font-semibold text-main">{{ m.title }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="ext-badge">{{ m.fileType || 'DOCUMENT' }}</span>
+                  </td>
+                  <td>{{ m.uploadedAt | date:'mediumDate' }}</td>
+                  <td class="text-right">
+                    <button
+                      class="download-link-btn"
+                      (click)="downloadMaterial(m.materialId)">
+                      📥 Download File
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

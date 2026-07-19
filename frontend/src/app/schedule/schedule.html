@@ -1,0 +1,57 @@
+<div class="schedule-container">
+  <div class="page-header">
+    <h1>Weekly Class Schedule</h1>
+    <p class="subtitle">Review your lecture timings, room locations, and course periods for this semester.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Building your weekly schedule...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    <!-- Weekly schedule layout cards -->
+    <div class="weekly-schedule-grid">
+      @for (day of daysOfWeek; track day) {
+        <div class="day-card" [class.has-classes]="hasSchedule(day)">
+          <div class="day-header font-semibold">
+            <h3>{{ day }}</h3>
+            @if (hasSchedule(day)) {
+              <span class="classes-count font-semibold">{{ scheduleByDay[day].length }} Lectures</span>
+            }
+          </div>
+          
+          <div class="day-body">
+            @if (!hasSchedule(day)) {
+              <div class="no-classes-box">
+                <p class="no-classes-text italic">No classes scheduled</p>
+              </div>
+            } @else {
+              <div class="schedules-list">
+                @for (s of scheduleByDay[day]; track s.scheduleId) {
+                  <div class="schedule-item-card">
+                    <div class="time-block font-semibold">
+                      <span class="start-time">{{ s.startTime.substring(0, 5) }}</span>
+                      <span class="time-separator">-</span>
+                      <span class="end-time">{{ s.endTime.substring(0, 5) }}</span>
+                    </div>
+                    <div class="course-info-block">
+                      <h4 class="course-title font-semibold">{{ s.courseName }}</h4>
+                      <span class="room-badge">Room {{ s.roomNumber }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

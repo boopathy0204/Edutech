@@ -1,0 +1,186 @@
+<div class="assignments-container">
+  <div class="page-header-flex">
+    <div>
+      <h1>Assignments Catalog</h1>
+      <p class="subtitle"> modify, publish, and delete student assignments and tasks.</p>
+    </div>
+    <button (click)="openCreateModal()" class="btn btn-primary">
+      ➕ Create Assignment
+    </button>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+  @if (error && !showModal) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  <!-- Filters Card -->
+  <div class="filters-card">
+    <div class="search-box" style="display: flex; gap: 8px; align-items: center; flex: 1;">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (keyup.enter)="applySearch()" 
+        placeholder="Search assignment by title..." 
+        class="filter-input search-input"
+      />
+      <button (click)="applySearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center; background-color: var(--color-primary); color: #ffffff; border: 1px solid var(--color-primary); border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
+    </div>
+    <div class="filter-controls">
+      <select [(ngModel)]="courseFilter" (change)="onSearch()" class="filter-input select-input">
+        <option value="">All Courses</option>
+        @for (c of courses; track c.courseId) {
+          <option [value]="c.courseId">{{ c.courseCode }} - {{ c.courseName }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Assignments Grid Card List -->
+  @if (loading) {
+    <div class="skeleton-grid">
+      <div class="skeleton-card" style="height: 180px;"></div>
+      <div class="skeleton-card" style="height: 180px;"></div>
+    </div>
+  } @else {
+    @if (filteredAssignments.length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📝</div>
+        <h2>No Assignments Found</h2>
+        <p>No assignments found matching your active filter criteria.</p>
+      </div>
+    } @else {
+      <div class="assignments-grid">
+        @for (a of filteredAssignments; track a.assignmentId) {
+          <div class="assignment-card">
+            <div class="card-header">
+              <span class="course-code font-semibold">{{ a.courseCode }}</span>
+              <span class="status-badge" [class.active]="a.status === 'Active'" [class.rejected]="a.status === 'Expired'">
+                {{ a.status }}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <h3 class="assignment-title font-semibold">{{ a.title }}</h3>
+              <p class="assignment-desc">{{ a.description || 'No instruction details listed.' }}</p>
+              
+              <div class="metadata-row">
+                <div class="meta-item">
+                  <span class="lbl">Due Date</span>
+                  <span class="val font-semibold">{{ a.dueDate | date:'medium' }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="lbl">Max Marks</span>
+                  <span class="val font-semibold">{{ a.maxMarks }} marks</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button (click)="openEditModal(a)" class="btn-action edit-btn">
+                ✏ Edit
+              </button>
+              <button (click)="deleteAssignment(a.assignmentId)" class="btn-action delete-btn">
+                🗑 Delete
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination-footer">
+          <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="page-arrow">
+            &larr; Previous
+          </button>
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)" class="page-arrow">
+            Next &rarr;
+          </button>
+        </div>
+      }
+    }
+  }
+
+  <!-- Assignment Editor Modal Dialog -->
+  @if (showModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>{{ modalTitle }}</h3>
+          <button (click)="closeModal()" class="close-btn">✖</button>
+        </div>
+        
+        <form (submit)="saveAssignment(); $event.preventDefault();" class="modal-form">
+          @if (error) {
+            <div class="alert error" style="margin-bottom: 12px;">{{ error }}</div>
+          }
+
+          <div class="form-group">
+            <label class="form-lbl">Course Context</label>
+            <select [(ngModel)]="formCourseId" name="modalCourse" class="form-control" required>
+              @for (c of courses; track c.courseId) {
+                <option [value]="c.courseId">{{ c.courseCode }} - {{ c.courseName }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Assignment Title</label>
+            <input 
+              type="text" 
+              [(ngModel)]="formTitle" 
+              name="modalTitle" 
+              class="form-control"  
+              required 
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Instructions / Description</label>
+            <textarea 
+              [(ngModel)]="formDesc" 
+              name="modalDesc" 
+              class="form-control text-area" 
+              placeholder="List instructions"
+            ></textarea>
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group flex-1">
+              <label class="form-lbl">Due Date & Time</label>
+              <input 
+                type="datetime-local" 
+                [(ngModel)]="formDueDate" 
+                name="modalDueDate" 
+                class="form-control" 
+                required 
+              />
+            </div>
+
+            <div class="form-group flex-1">
+              <label class="form-lbl">Maximum Marks</label>
+              <input 
+                type="number" 
+                [(ngModel)]="formMaxMarks" 
+                name="modalMaxMarks" 
+                class="form-control" 
+                required 
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeModal()" class="btn btn-outline">Cancel</button>
+            <button type="submit" [disabled]="saving" class="btn btn-primary">
+              {{ saving ? 'Saving...' : '💾 Save Assignment' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

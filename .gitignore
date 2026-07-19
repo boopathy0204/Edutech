@@ -1,0 +1,32 @@
+# Build directories
+target/
+Backend/target/
+frontend/dist/
+frontend/.angular/
+
+# Node dependencies
+node_modules/
+frontend/node_modules/
+
+# OS files
+.DS_Store
+**/.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+Backend/.idea/
+Backend/.vscode/
+frontend/.vscode/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Log files
+*.log
+
+# Local config/properties
+application-local.properties
+application-dev.properties
+*.local

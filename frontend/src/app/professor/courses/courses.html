@@ -1,0 +1,219 @@
+<div class="courses-container">
+  <div class="page-header-flex">
+    <div>
+      <h1>My Courses</h1>
+      <p class="subtitle">Oversee assigned classes, enrollment sizes, and details.</p>
+    </div>
+    <div class="header-actions">
+      <button (click)="openCreateModal()" class="btn btn-primary" style="font-weight: 600;">
+        ➕ Create Course
+      </button>
+    </div>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <!-- Skeleton loader -->
+    <div class="skeleton-wrapper">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-row" style="width: 90%;"></div>
+      <div class="skeleton-row" style="width: 80%;"></div>
+      <div class="skeleton-row" style="width: 85%;"></div>
+    </div>
+  } @else {
+
+
+    <!-- Search and Filters Panel -->
+    <div class="filters-card" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+      <div class="search-box" style="display: flex; gap: 12px; width: 100%;">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (keydown.enter)="onSearch()" 
+          placeholder="Search by Course Code or Course Name..." 
+          class="filter-input search-input"
+          style="flex: 1; max-width: none;"
+        />
+        <button (click)="onSearch()" class="btn btn-primary" style="padding: 10px 18px; font-weight: 600;">
+          🔍 Search
+        </button>
+        @if (searchQuery) {
+          <button (click)="clearSearch()" class="btn btn-outline" style="padding: 10px 18px; font-weight: 600; border-color: var(--color-border); color: var(--color-text-muted);">
+            Clear
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (filteredCourses.length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📚</div>
+        <h2>No Matching Courses</h2>
+        <p>No assigned courses match your search text.</p>
+      </div>
+    } @else {
+      <!-- Table View -->
+      <div class="table-card">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Academic Period</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of filteredCourses; track c.courseId) {
+                <tr>
+                  <td class="font-semibold text-primary">{{ c.courseCode }}</td>
+                  <td>{{ c.courseName }}</td>
+                  <td>{{ c.credits }} credits</td>
+                  <td>{{ c.academicYear }} ({{ c.academicHalf }})</td>
+                  <td>
+                    <span [style.background-color]="c.courseStatus === 'COMPLETED' ? '#f1f5f9' : (c.courseStatus === 'ACTIVE' ? '#d1fae5' : '#fef3c7')"
+                          [style.color]="c.courseStatus === 'COMPLETED' ? '#64748b' : (c.courseStatus === 'ACTIVE' ? '#065f46' : '#d97706')"
+                          style="padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                      {{ c.courseStatus || 'UPCOMING' }}
+                    </span>
+                  </td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <a [routerLink]="['/professor/courses', c.courseId]" class="details-btn font-semibold" style="margin-right: 12px; text-decoration: none;">
+                      Go to Course &rarr;
+                    </a>
+                    
+                    @if (c.courseStatus !== 'COMPLETED') {
+                      <button (click)="openEditModal(c)" class="details-btn font-semibold" style="background-color: #f1f5f9; color: var(--color-text-main); border: 1px solid var(--color-border); margin-right: 8px;">
+                        ✏ Edit
+                      </button>
+                      <button (click)="deleteCourse(c.courseId)" class="details-btn font-semibold" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2;">
+                        🗑 Delete
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination Footer -->
+      @if (totalPages > 1) {
+        <div class="pagination-footer">
+          <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="page-arrow">
+            &larr; Previous
+          </button>
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)" class="page-arrow">
+            Next &rarr;
+          </button>
+        </div>
+      }
+    }
+  }
+</div>
+
+<!-- CREATE/EDIT COURSE MODAL -->
+@if (showModal) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title font-semibold">{{ modalTitle }}</h2>
+        <button (click)="closeModal()" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveCourse()" #courseForm="ngForm">
+          <div class="form-group">
+            <label class="form-lbl">Course Code <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="formCode" 
+              name="code" 
+              class="form-control" 
+              placeholder="e.g. CS101" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Course Name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="formName" 
+              name="name" 
+              class="form-control" 
+              placeholder="Enter courseName" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Credits <span class="required">*</span></label>
+            <input 
+              type="number" 
+              [(ngModel)]="formCredits" 
+              name="credits" 
+              class="form-control" 
+              min="1" 
+              required
+            />
+          </div>
+
+          <div class="form-group-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-lbl">Enrollment Start Date</label>
+              <input type="date" [(ngModel)]="formEnrollStart" name="enrollStart" class="form-control" />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-lbl">Enrollment End Date</label>
+              <input type="date" [(ngModel)]="formEnrollEnd" name="enrollEnd" class="form-control" />
+            </div>
+          </div>
+
+          <div class="form-group-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-lbl">Course Start Date</label>
+              <input type="date" [(ngModel)]="formCourseStart" name="courseStart" class="form-control" />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-lbl">Course End Date</label>
+              <input type="date" [(ngModel)]="formCourseEnd" name="courseEnd" class="form-control" />
+            </div>
+          </div>
+
+
+
+          <div class="form-group">
+            <label class="form-lbl">Description</label>
+            <textarea 
+              [(ngModel)]="formDesc" 
+              name="desc" 
+              class="form-control text-area" 
+              placeholder="Brief course syllabus summary..."
+            ></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeModal()" class="btn btn-outline" style="padding: 10px 20px;">
+              Cancel
+            </button>
+            <button type="submit" [disabled]="saving" class="btn btn-primary" style="padding: 10px 24px;">
+              {{ saving ? 'Saving...' : 'Save Course' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

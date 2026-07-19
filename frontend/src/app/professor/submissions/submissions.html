@@ -1,0 +1,184 @@
+<div class="submissions-container">
+  <div class="page-header">
+    <h1>Student Submissions Center</h1>
+    <p class="subtitle">Review uploaded attachments, log submissions, and grade student attempts.</p>
+  </div>
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  <!-- Filters Card panel -->
+  <div class="filters-card">
+    <div class="search-box" style="display: flex; gap: 8px; align-items: center; flex: 1;">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (keyup.enter)="applySearch()" 
+        placeholder="Search by student name, registration number, or task title..." 
+        class="filter-input search-input"
+      />
+      <button (click)="applySearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center; background-color: var(--color-primary); color: #ffffff; border: 1px solid var(--color-primary); border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
+    </div>
+    <div class="filter-controls">
+      <select [(ngModel)]="statusFilter" (change)="onSearch()" class="filter-input select-input">
+        <option value="">All Statuses</option>
+        <option value="SUBMITTED">Submitted</option>
+        <option value="GRADED">Graded</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Submissions Data Table Card -->
+  @if (loading) {
+    <div class="skeleton-wrapper">
+      <div class="skeleton-row" style="width: 100%;"></div>
+      <div class="skeleton-row" style="width: 95%;"></div>
+      <div class="skeleton-row" style="width: 90%;"></div>
+    </div>
+  } @else {
+    @if (filteredSubmissions.length === 0) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📥</div>
+        <h2>No Submissions Found</h2>
+        <p>No student submissions found matching the selected filters.</p>
+      </div>
+    } @else {
+      <div class="table-card">
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student Details</th>
+                <th>Assignment Task</th>
+                <th>Uploaded Date</th>
+                <th>Status</th>
+                <th>File</th>
+                <th>Grade Details</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (sub of filteredSubmissions; track sub.submissionId) {
+                <tr>
+                  <td>
+                    <div class="student-info-col">
+                      <span class="font-semibold">{{ sub.studentName }}</span>
+                      <span class="reg-subtxt">{{ sub.regNumber }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="assignment-info-col">
+                      <span class="font-semibold">{{ sub.assignmentTitle }}</span>
+                      @if (sub.courseCode) {
+                        <span class="course-code-subtxt">{{ sub.courseCode }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td>{{ sub.submittedDate | date:'medium' }}</td>
+                  <td>
+                    <span 
+                      class="status-badge" 
+                      [class.active]="sub.status === 'SUBMITTED'" 
+                      [class.pending]="sub.status === 'GRADED'" 
+                    >
+                      {{ sub.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button (click)="downloadSubmission(sub.submissionId, sub.fileName)" class="file-download-link" title="Download Student Attempt" style="background: transparent; border: none; cursor: pointer; text-align: left; padding: 0; font-family: inherit; font-size: 14px;">
+                      📄 Download File
+                    </button>
+                  </td>
+                  <td>
+                    @if (sub.status === 'GRADED') {
+                      <span class="marks-display font-semibold">{{ sub.marks }} marks</span>
+                    } @else {
+                      <span class="marks-display none-tag">-</span>
+                    }
+                  </td>
+                  <td>
+                    @if (sub.status !== 'GRADED') {
+                      <button (click)="openGradeModal(sub)" class="grade-action-btn font-semibold">
+                        🎓 Grade Attempt
+                      </button>
+                    } @else {
+                      <span class="text-muted" style="font-size: 13px; color: var(--color-text-muted);">Graded</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination-footer">
+          <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="page-arrow">
+            &larr; Previous
+          </button>
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)" class="page-arrow">
+            Next &rarr;
+          </button>
+        </div>
+      }
+    }
+  }
+
+  <!-- Grade Evaluator Overlay Dialog Modal -->
+  @if (showGradeModal && selectedSubmission) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Grade Assessment: {{ selectedSubmission.studentName }}</h3>
+          <button (click)="closeGradeModal()" class="close-btn">✖</button>
+        </div>
+
+        <form (submit)="saveGrade(); $event.preventDefault();" class="modal-form">
+          <div class="info-banner-summary">
+            <p><strong>Assignment:</strong> {{ selectedSubmission.assignmentTitle }}</p>
+            <p><strong>Registration Number:</strong> {{ selectedSubmission.regNumber }}</p>
+          </div>
+
+          <div class="form-group-row">
+            <div class="form-group flex-1">
+              <label class="form-lbl">Marks Obtained</label>
+              <div class="marks-input-wrapper">
+                <input 
+                  type="number" 
+                  [(ngModel)]="formMarks" 
+                  name="marks" 
+                  min="0" 
+                  [max]="maxMarks" 
+                  class="form-control marks-control" 
+                  required 
+                />
+                <span class="denom-max">/ {{ maxMarks }} marks</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Grade Comments & Feedback</label>
+            <textarea 
+              [(ngModel)]="formFeedback" 
+              name="feedback" 
+              class="form-control text-area" 
+              placeholder="Leave detailed comments, remarks, or notes..."
+            ></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeGradeModal()" class="btn btn-outline">Cancel</button>
+            <button type="submit" [disabled]="saving" class="btn btn-primary">
+              {{ saving ? 'Saving Grade...' : ' Submit Grade Evaluation' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

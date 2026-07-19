@@ -1,0 +1,217 @@
+.notifications-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.unread-badge {
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #ef4444;
+  color: #ffffff;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+}
+
+.page-header .subtitle {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Card layout list stack */
+.notifications-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 12px;
+}
+
+.notifications-stack-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.notification-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-card-bg);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.notification-item-row.unread {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Unread blue dot indicator */
+.status-indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: transparent;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.notification-item-row.unread .status-indicator-dot {
+  background-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.msg-content {
+  flex: 1;
+}
+
+.msg-title {
+  font-size: 15px;
+  color: var(--color-text-main);
+  margin: 0 0 4px 0;
+}
+
+.msg-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0 0 8px 0;
+}
+
+.msg-date {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.msg-actions {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.read-action-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.read-action-btn:hover {
+  border-color: var(--color-primary);
+  background-color: #f8fafc;
+}
+
+.read-check-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+/* Empty notifications page designs */
+.empty-state-card {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 64px 24px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state-card h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0 0 8px 0;
+}
+
+.empty-state-card p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Alert banners */
+.alert {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+.alert.error {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #991b1b;
+}
+
+.loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  color: var(--color-text-muted);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.font-semibold { font-weight: 600; }

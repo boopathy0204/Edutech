@@ -1,0 +1,455 @@
+.materials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  letter-spacing: -0.02em;
+  margin: 0 0 4px 0;
+}
+
+.materials-split-layout {
+  display: block;
+}
+
+@media (max-width: 960px) {
+  .materials-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.upload-sidebar-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.sidebar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin: 0 0 20px 0;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-lbl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.form-control {
+  padding: 10px 14px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: var(--color-text-main);
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--color-primary);
+}
+
+.text-area {
+  height: 80px;
+  resize: none;
+}
+
+/* Drag Drop File Zone */
+.drag-drop-zone {
+  position: relative;
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.drag-drop-zone:hover {
+  border-color: var(--color-primary);
+  background-color: #eff6ff;
+}
+
+.file-input-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.drop-zone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.upload-icon {
+  font-size: 28px;
+}
+
+.upload-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.upload-subtext {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.btn-block {
+  width: 100%;
+  padding: 12px;
+}
+
+/* Materials grid layout */
+.materials-main-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.material-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-fast);
+}
+
+.material-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.card-file-header {
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 11px 11px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.icon-bubble {
+  width: 38px;
+  height: 38px;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-icon-large {
+  font-size: 18px;
+}
+
+.course-code-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  background-color: #eff6ff;
+  color: var(--color-primary);
+  border-radius: 12px;
+}
+
+.card-file-body {
+  padding: 16px;
+  flex: 1;
+}
+
+.material-title {
+  font-size: 14px;
+  color: var(--color-text-main);
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.material-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.file-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filename-lbl {
+  font-size: 11px;
+  color: var(--color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uploaddate-lbl {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.card-file-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+}
+
+.action-link {
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.action-link:hover {
+  opacity: 0.8;
+}
+
+.download-btn {
+  color: var(--color-primary);
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+
+/* Empty State Card */
+.empty-state-card {
+  background-color: #ffffff;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.empty-icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+}
+
+.empty-state-card h2 {
+  font-size: 18px;
+  color: var(--color-text-main);
+  margin: 0 0 8px 0;
+}
+
+.empty-state-card p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Filters panel card */
+.filters-card {
+  background-color: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 260px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-input {
+  padding: 9px 14px;
+  font-size: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: var(--color-text-main);
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-input:focus {
+  border-color: var(--color-primary);
+}
+
+.select-input {
+  width: 200px;
+  cursor: pointer;
+}
+
+/* Modal Dialog overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 520px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: modalEnter 0.2s ease-out;
+}
+
+@keyframes modalEnter {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  padding: 18px 24px;
+  background-color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h3 {
+  font-size: 16px;
+  margin: 0;
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Generic buttons */
+.btn {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border: 1px solid var(--color-primary);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Generic Alert boxes */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.alert.success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.alert.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  font-weight: 600;
+}

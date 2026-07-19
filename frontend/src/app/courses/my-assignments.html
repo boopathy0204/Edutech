@@ -1,0 +1,62 @@
+<div class="assignments-container">
+  <!-- Navigation Header -->
+  <div class="back-nav">
+    <a [routerLink]="['/courses', courseId]" class="back-link">&larr; Back to {{ course?.courseName || 'Course Details' }}</a>
+  </div>
+
+  <div class="page-header">
+    <h1>My Assignments</h1>
+    <p class="subtitle">View due dates, grading statuses, and feedback for all assignments posted in this course.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving assignments...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (assignments.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">📝</div>
+        <h2>No Assignments Posted</h2>
+        <p>No assignments have been posted by the instructor for this course yet.</p>
+      </div>
+    } @else {
+      <!-- Assignments list structure card -->
+      <div class="assignments-card">
+        <h2 class="card-title">Course Assignments ({{ assignments.length }})</h2>
+        
+        <div class="assignment-rows-list">
+          @for (a of assignments; track a.assignmentId) {
+            <div class="assignment-item-row">
+              <div class="main-info">
+                <div class="title-row-flex">
+                  <h3 class="assignment-title font-semibold">{{ a.assignmentTitle || a.title }}</h3>
+                  <span class="status-tag" [class]="a.status.toLowerCase().replace(' ', '-')">
+                    {{ a.status }}
+                  </span>
+                </div>
+                <p class="meta-info">
+                  Due Date: <strong class="due-highlight">{{ a.dueDate | date:'mediumDate' }}</strong> &bull; 
+                  Max Mark: <strong>{{ a.maxMarks }} Marks</strong>
+                </p>
+              </div>
+              
+              <div class="grade-score-actions">            
+                <a [routerLink]="['/courses', courseId, 'assignments', a.assignmentId]" class="details-btn">
+                  View details &rarr;
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

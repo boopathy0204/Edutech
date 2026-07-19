@@ -1,0 +1,421 @@
+<div class="course-details-container">
+  <!-- Back Button Link -->
+  <div class="back-navigation">
+    <a routerLink="/professor/courses" class="back-link">&larr; Back to Assigned Courses List</a>
+  </div>
+
+  @if (success) {
+    <div class="alert success" style="margin-bottom: 20px;">{{ success }}</div>
+  }
+  @if (error) {
+    <div class="alert error" style="margin-bottom: 20px;">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <div class="skeleton-wrapper">
+      <div class="skeleton-header" style="width: 350px;"></div>
+      <div class="skeleton-tabs"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  } @else {
+    @if (course && !error) {
+      <!-- Portal Cover Header -->
+      <header class="course-header-banner">
+        <span class="banner-code font-semibold">{{ course.courseCode }}</span>
+        <h1 class="banner-title">{{ course.courseName }}</h1>
+        <p class="banner-subtitle">Credits: {{ course.credits }} cr &bull; Instructor: {{ course.professorName }}</p>
+      </header>
+
+      <!-- Tabs Navigation list -->
+      <nav class="details-tabs-bar">
+        <button (click)="setTab('overview')" [class.active]="activeTab === 'overview'" class="tab-item">
+          ℹ Overview
+        </button>
+        <button (click)="setTab('schedule')" [class.active]="activeTab === 'schedule'" class="tab-item">
+          📅 Class Schedule
+        </button>
+        <button (click)="setTab('students')" [class.active]="activeTab === 'students'" class="tab-item">
+          👥 Enrolled Students
+        </button>
+        <button (click)="setTab('assignments')" [class.active]="activeTab === 'assignments'" class="tab-item">
+          📝 Assignments
+        </button>
+        <button (click)="setTab('materials')" [class.active]="activeTab === 'materials'" class="tab-item">
+          📄 Materials
+        </button>
+      </nav>
+
+      <!-- Active Tab Panels Content -->
+      <div class="tab-content-panel">
+        
+        <!-- OVERVIEW TAB -->
+        @if (activeTab === 'overview') {
+          <div class="overview-grid">
+            <div class="details-card-left">
+              <h2 class="section-title">Course Description</h2>
+              <p class="desc-text">{{ course.description || 'No course syllabus description listed.' }}</p>
+            </div>
+            
+            <div class="details-card-right">
+              <h2 class="section-title">Class Information</h2>
+              <div class="meta-details-list">
+                <div class="meta-row">
+                  <span class="lbl">Course Code</span>
+                  <span class="val font-semibold">{{ course.courseCode }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Department</span>
+                  <span class="val">{{ course.department }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Teaching Professor</span>
+                  <span class="val font-semibold">{{ course.professorName }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Students Enrolled</span>
+                  <span class="val highlight-blue">{{ course.studentsCount }} Students</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Total Assignments</span>
+                  <span class="val">{{ course.assignmentsCount }} Tasks</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Academic Period</span>
+                  <span class="val font-semibold">{{ course.academicYear }} ({{ course.academicHalf }})</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Course Status</span>
+                  <span class="val font-semibold" [style.color]="course.courseStatus === 'COMPLETED' ? '#64748b' : (course.courseStatus === 'ACTIVE' ? '#16a34a' : '#d97706')">
+                    {{ course.courseStatus || 'UPCOMING' }}
+                  </span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Enrollment Start</span>
+                  <span class="val">{{ course.enrollmentStartDate ? (course.enrollmentStartDate | date:'mediumDate') : 'Anytime' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Enrollment End</span>
+                  <span class="val">{{ course.enrollmentEndDate ? (course.enrollmentEndDate | date:'mediumDate') : 'Anytime' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Course Start Date</span>
+                  <span class="val font-semibold">{{ course.courseStartDate ? (course.courseStartDate | date:'mediumDate') : 'TBD' }}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="lbl">Course End Date</span>
+                  <span class="val font-semibold">{{ course.courseEndDate ? (course.courseEndDate | date:'mediumDate') : 'TBD' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- SCHEDULE TAB -->
+        @if (activeTab === 'schedule') {
+          <div class="schedule-tab-card">
+            <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 class="section-title" style="margin: 0;">Managed Timetable Calendar</h2>
+              <button (click)="openScheduleModal()" class="btn btn-primary">
+                ➕ Add Schedule Slot
+              </button>
+            </div>
+            
+            @if (scheduleList.length === 0) {
+              <div class="empty-state">
+                <p>No active schedule records listed for this class course.</p>
+              </div>
+            } @else {
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Day</th>
+                      <th>Time Slot</th>
+                      <th>Classroom Location</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (s of scheduleList; track s.scheduleId) {
+                      <tr>
+                        <td class="font-semibold">{{ s.day }}</td>
+                        <td>{{ s.startTime }} - {{ s.endTime }}</td>
+                        <td>
+                          <span class="room-pill">{{ s.roomNumber }}</span>
+                        </td>
+                        <td style="text-align: right;">
+                          <button (click)="deleteSchedule(s.scheduleId)" class="btn btn-outline" style="background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; padding: 6px 12px; font-size: 12px;">
+                            🗑 Delete
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- STUDENTS TAB -->
+        @if (activeTab === 'students') {
+          <div class="students-tab-card">
+            <div class="card-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <h2 class="section-title" style="margin: 0;">Enrolled Students ({{ studentsList.length }} total)</h2>
+              <div class="search-box" style="display: flex; gap: 8px; max-width: 400px; width: 100%;">
+                <input 
+                  type="text" 
+                  [(ngModel)]="studentSearchQuery" 
+                  (keyup.enter)="onStudentSearch()"
+                  placeholder="Search enrolled students..." 
+                  class="filter-input search-input"
+                  style="flex: 1; padding: 8px 12px; font-size: 13px; border: 1px solid var(--color-border); border-radius: 6px;"
+                />
+                <button (click)="onStudentSearch()" class="btn btn-primary" style="padding: 8px 16px; white-space: nowrap; height: 36px; display: inline-flex; align-items: center; font-size: 13px;">Search</button>
+              </div>
+            </div>
+            
+            @if (studentsList.length === 0) {
+              <div class="empty-state">
+                <p>No enrolled students found.</p>
+              </div>
+            } @else {
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Registration No.</th>
+                      <th>Student Name</th>
+                      <th>Enrollment Status</th>
+                      <th>Enrollment Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (stu of studentsList; track stu.studentId) {
+                      <tr>
+                        <td class="font-semibold text-primary">{{ stu.registrationNumber }}</td>
+                        <td class="font-semibold">{{ stu.studentName }}</td>
+                        <td>
+                          <span class="status-badge" [class.active]="stu.status === 'APPROVED' || stu.status === 'ACTIVE'" [class.pending]="stu.status === 'PENDING'">
+                            {{ stu.status }}
+                          </span>
+                        </td>
+                        <td>{{ stu.enrollmentDate }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ASSIGNMENTS TAB -->
+        @if (activeTab === 'assignments') {
+          <div class="assignments-tab-card">
+            <div class="card-header-flex">
+              <h2 class="section-title">Course Assignments</h2>
+              <a routerLink="/professor/assignments" class="btn btn-primary">
+                ➕ Create & Manage Assignments
+              </a>
+            </div>
+
+            @if (assignmentsList.length === 0) {
+              <div class="empty-state">
+                <p>No assignments have been assigned to this course yet.</p>
+              </div>
+            } @else {
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Assignment Title</th>
+                      <th>Due Date</th>
+                      <th>Max Marks</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of assignmentsList; track a.assignmentId) {
+                      <tr>
+                        <td class="font-semibold">{{ a.title }}</td>
+                        <td>{{ a.dueDate | date:'medium' }}</td>
+                        <td>{{ a.maxMarks }} marks</td>
+                        <td>
+                          <a [routerLink]="['/professor/assignment-submissions', a.assignmentId]" class="btn btn-outline">
+                            View Submissions &rarr;
+                          </a>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- MATERIALS TAB -->
+        @if (activeTab === 'materials') {
+          <div class="materials-tab-card">
+            <div class="card-header-flex">
+              <h2 class="section-title">Course Lectures & Files</h2>
+              <button (click)="openMaterialModal()" class="btn btn-primary">
+                📤 Upload New Material
+              </button>
+            </div>
+
+            @if (materialsList.length === 0) {
+              <div class="empty-state">
+                <p>No materials uploaded for this course yet.</p>
+              </div>
+            } @else {
+              <div class="materials-grid-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                @for (m of materialsList; track m.materialId) {
+                  <div class="material-card-compact" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--color-border); border-radius: 8px; padding: 14px; background-color: #ffffff;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <span class="file-icon" style="font-size: 24px;">📄</span>
+                      <div class="file-main">
+                        <h4 class="file-title font-semibold" style="margin: 0; font-size: 14px;">{{ m.title }}</h4>
+                        <p class="file-meta-txt" style="margin: 2px 0 0 0; font-size: 11px; color: var(--color-text-muted);">{{ m.fileName }}</p>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <button (click)="downloadMaterial(m.materialId, m.fileName)" class="btn btn-outline" style="padding: 6px 10px; font-size: 11px; cursor: pointer;">
+                        📥
+                      </button>
+                      <button (click)="deleteMaterial(m.materialId)" class="btn btn-outline" style="padding: 6px 10px; font-size: 11px; background-color: #fef2f2; color: #dc2626; border-color: #fee2e2;">
+                        🗑
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    }
+  }
+</div>
+
+<!-- ADD SCHEDULE MODAL -->
+@if (showScheduleModal) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title font-semibold">Add Class Schedule</h2>
+        <button (click)="closeScheduleModal()" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveSchedule()">
+          <div class="form-group">
+            <label class="form-lbl">Day of the Week <span class="required">*</span></label>
+            <select [(ngModel)]="formDay" name="day" class="form-control" required>
+              <option value="MONDAY">Monday</option>
+              <option value="TUESDAY">Tuesday</option>
+              <option value="WEDNESDAY">Wednesday</option>
+              <option value="THURSDAY">Thursday</option>
+              <option value="FRIDAY">Friday</option>
+              <option value="SATURDAY">Saturday</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Start Time <span class="required">*</span></label>
+            <input 
+              type="time" 
+              [(ngModel)]="formStartTime" 
+              name="startTime" 
+              class="form-control" 
+              placeholder="e.g. 09:00"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">End Time <span class="required">*</span></label>
+            <input 
+              type="time" 
+              [(ngModel)]="formEndTime" 
+              name="endTime" 
+              class="form-control" 
+              placeholder="e.g. 10:30"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Classroom / Room Number <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="formRoomNumber" 
+              name="roomNumber" 
+              class="form-control" 
+              placeholder="e.g. Room 404" 
+              required
+            />
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeScheduleModal()" class="btn btn-outline" style="padding: 10px 20px;">
+              Cancel
+            </button>
+            <button type="submit" [disabled]="savingSchedule" class="btn btn-primary" style="padding: 10px 24px;">
+              {{ savingSchedule ? 'Adding...' : 'Add Schedule' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- UPLOAD MATERIAL MODAL -->
+@if (showMaterialModal) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title font-semibold">Upload Lecture Material</h2>
+        <button (click)="closeMaterialModal()" class="close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="uploadMaterial()">
+          <div class="form-group">
+            <label class="form-lbl">Material Title <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="formMaterialTitle" 
+              name="materialTitle" 
+              class="form-control" 
+              placeholder="e.g. Lecture 1: Complexity Analysis" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Select File <span class="required">*</span></label>
+            <input 
+              type="file" 
+              (change)="onMaterialFileSelected($event)" 
+              class="form-control" 
+              required
+            />
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeMaterialModal()" class="btn btn-outline" style="padding: 10px 20px;">
+              Cancel
+            </button>
+            <button type="submit" [disabled]="uploadingMaterial" class="btn btn-primary" style="padding: 10px 24px;">
+              {{ uploadingMaterial ? 'Uploading...' : 'Publish Material' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

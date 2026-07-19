@@ -1,0 +1,71 @@
+<div class="grades-container">
+  <div class="page-header">
+    <h1>My Academic Grades</h1>
+    <p class="subtitle">Review your evaluation performance, letter grades, and feedback comments from your professors.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Retrieving academic records...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (grades.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">🎓</div>
+        <h2>No Grades Recorded</h2>
+        <p>No assignment submissions have been graded for you yet. Keep submitting your tasks on time.</p>
+      </div>
+    } @else {
+      <!-- Grades list card view -->
+      <div class="grades-card">
+        <h2 class="card-title">Completed Evaluations ({{ grades.length }})</h2>
+        
+        <div class="table-container">
+          <table class="grades-table">
+            <thead>
+              <tr>
+                <th>Assignment Title</th>
+                <th>Obtained Marks</th>
+                <th>Percentage</th>
+                <th>Letter Grade</th>
+                <th>Graded Date</th>
+                <th>Professor Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (g of grades; track g.gradeId) {
+                <tr>
+                  <td class="font-semibold text-main">{{ g.assignmentTitle }}</td>
+                  <td>
+                    <span class="score-badge">{{ g.marks }} / {{ g.maxmark }} Marks</span>
+                  </td>
+                  <td>{{ g.percentage | number:'1.1-2' }}%</td>
+                  <td>
+                    <span class="letter-grade-badge" [class]="g.letterGrade ? g.letterGrade.substring(0, 1).toLowerCase() : 'f'">
+                      {{ g.letterGrade || 'N/A' }}
+                    </span>
+                  </td>
+                  <td>{{ g.gradedAt | date:'mediumDate' }}</td>
+                  <td class="feedback-cell">
+                    @if (g.feedback) {
+                      <span class="remarks-text">"{{ g.feedback }}"</span>
+                    } @else {
+                      <span class="remarks-text italic muted">No feedback text.</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

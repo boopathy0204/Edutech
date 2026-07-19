@@ -1,0 +1,292 @@
+<div class="students-container">
+  <div class="page-header">
+    <div>
+      <h1>Manage Student Profiles</h1>
+    </div>
+    <!-- Header Actions Removed (Manual Creation Not Allowed) -->
+  </div>
+
+  <!-- Error display -->
+  @if (error && !loading) {
+    <div class="error-banner">
+      <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-bar" style="display: flex; gap: 12px; align-items: center;">
+    <div class="search-input-wrapper" style="display: flex; align-items: center; gap: 8px; flex: 1;">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search by registration number or name..."
+        class="search-input"
+        style="flex: 1;"
+      />
+      <button (click)="onSearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center;">Search</button>
+    </div>
+
+    <div class="filter-dropdown-wrapper">
+      <select
+        [(ngModel)]="selectedDepartment"
+        (change)="applyLocalFilters()"
+        class="department-select"
+      >
+        <option value="">All Departments</option>
+        @for (dep of departments; track dep) {
+          <option [value]="dep">{{ dep }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Student profile list -->
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-wrapper">
+        <div class="spinner"></div>
+        <p>Loading student profiles...</p>
+      </div>
+    } @else {
+      @if (filteredStudents.length === 0) {
+        <div class="empty-state">
+          <p>No student profiles match your search criteria.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>Registration No</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Program</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of filteredStudents; track s.studentId) {
+                <tr>
+                  <td class="font-semibold">{{ s.registrationNumber }}</td>
+                  <td>{{ s.firstName }} {{ s.lastName }}</td>
+                  <td>{{ s.phone }}</td>
+                  <td>{{ s.department }}</td>
+                  <td>{{ s.program }}</td>
+
+                  <td>
+                    <div class="action-buttons">
+                      <a [routerLink]="['/admin/users', s.userId, 'details']" class="action-btn view-btn" style="text-decoration: none;" title="View details">
+                        View Details
+                      </a>
+                      <button (click)="openEditModal(s)" class="action-btn edit-btn" title="Edit student">
+                        Edit
+                      </button>
+                      <button (click)="deleteStudent(s.studentId)" class="action-btn delete-btn" title="Delete student">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create/Edit Modal Popup Overlay -->
+  @if (showModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>{{ modalTitle }}</h2>
+          <button (click)="closeModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (formError) {
+            <div class="modal-error-banner">
+              {{ formError }}
+            </div>
+          }
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="registrationNumber">Registration Number</label>
+              <input
+                type="text"
+                id="registrationNumber"
+                [(ngModel)]="formRegistrationNumber"
+                placeholder="e.g. REG-100231"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input
+                type="text"
+                id="phone"
+                [(ngModel)]="formPhone"
+                placeholder="e.g. +1 555-0199"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                [(ngModel)]="formFirstName"
+                placeholder="e.g. Jane"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                [(ngModel)]="formLastName"
+                placeholder="e.g. Smith"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input
+                type="text"
+                id="department"
+                [(ngModel)]="formDepartment"
+                placeholder="e.g. Computer Science"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="program">Program</label>
+              <input
+                type="text"
+                id="program"
+                [(ngModel)]="formProgram"
+                placeholder="e.g. B.Sc. IT"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeModal()" class="btn-secondary">Cancel</button>
+          <button (click)="saveStudent()" class="btn-primary">Save Student</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- View Details Modal Overlay -->
+  @if (showDetailModal) {
+    <div class="modal-overlay">
+      <div class="modal-card wide">
+        <div class="modal-header">
+          <h2>Student Profile details: {{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}</h2>
+          <button (click)="closeDetailModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="details-section">
+            <div class="details-grid">
+              <div class="detail-item">
+                <span class="detail-lbl">Registration Number:</span>
+                <span class="detail-val font-semibold">{{ selectedStudent?.registrationNumber }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Program:</span>
+                <span class="detail-val font-semibold">{{ selectedStudent?.program }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Department:</span>
+                <span class="detail-val">{{ selectedStudent?.department }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Phone Number:</span>
+                <span class="detail-val">{{ selectedStudent?.phone }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-lbl">Login Account:</span>
+                <span class="detail-val font-semibold">@{{ selectedStudent?.username }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="courses-section">
+            <h3>Enrolled Academic Courses</h3>
+            @if (coursesLoading) {
+              <div class="loading-wrapper compact">
+                <div class="spinner"></div>
+                <p>Loading enrolled courses...</p>
+              </div>
+            } @else {
+              @if (coursesError) {
+                <div class="error-banner compact">
+                  {{ coursesError }}
+                </div>
+              } @else {
+                @if (selectedStudentCourses.length === 0) {
+                  <p class="empty-courses">This student is not currently enrolled in any courses.</p>
+                } @else {
+                  <div class="table-container compact">
+                    <table class="students-table compact">
+                      <thead>
+                        <tr>
+                          <th>Course Name</th>
+                          <th>Enrollment Date</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (c of selectedStudentCourses; track c.courseId) {
+                          <tr>
+                            <td>{{ c.courseName }}</td>
+                            <td>{{ c.enrollmentDate }}</td>
+                            <td>
+                              <span class="status-badge" [ngClass]="c.status?.toLowerCase()">{{ c.status }}</span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              }
+            }
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeDetailModal()" class="btn-primary">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

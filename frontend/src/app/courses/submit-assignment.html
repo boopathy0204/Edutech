@@ -1,0 +1,60 @@
+<div class="submit-container">
+  <!-- Navigation Header -->
+  <div class="back-nav">
+    <a [routerLink]="['/courses', courseId, 'assignments', assignmentId]" class="back-link">&larr; Back to Assignment Details</a>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Loading submission details...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (assignment && !error) {
+      <div class="submit-card">
+        <h1 class="page-title">Submit Solution</h1>
+        <p class="subtitle">Upload your document (PDF, Word doc, ZIP, or text sheet) for <strong>{{ assignment.title || assignment.assignmentTitle }}</strong>.</p>
+        
+        <form (ngSubmit)="onSubmit()" class="submit-form">
+          <!-- File selection block -->
+          <div class="form-group">
+            <label for="fileInput" class="form-lbl">Choose Assignment File</label>
+            <div class="file-uploader-box" [class.file-selected]="selectedFile">
+              <input
+                type="file"
+                id="fileInput"
+                (change)="onFileSelected($event)"
+                class="hidden-file-input"
+                required
+              />
+              <label for="fileInput" class="upload-trigger-label">
+                <span class="upload-icon">📤</span>
+                @if (selectedFile) {
+                  <span class="file-info font-semibold">{{ selectedFile.name }}</span>
+                  <span class="file-size">({{ (selectedFile.size / 1024) | number:'1.0-1' }} KB)</span>
+                } @else {
+                  <span class="prompt-text">Click to browse your files</span>
+                  <span class="supported-text">Supported formats: PDF, DOCX, ZIP (Max 10MB)</span>
+                }
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <a [routerLink]="['/courses', courseId, 'assignments', assignmentId]" class="cancel-btn">
+              Cancel
+            </a>
+            <button type="submit" [disabled]="submitting || !selectedFile" class="submit-btn">
+              {{ submitting ? 'Uploading Submission...' : 'Submit Assignment' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,202 @@
+<div class="staff-container">
+  <div class="page-header">
+    <div>
+      <h1>Manage Admin Staff Profiles</h1>
+    </div>
+    <!-- Header Actions Removed (Manual Creation Not Allowed) -->
+  </div>
+
+  <!-- Error display -->
+  @if (error && !loading) {
+    <div class="error-banner">
+      <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-bar" style="display: flex; gap: 12px; align-items: center;">
+    <div class="search-input-wrapper" style="display: flex; align-items: center; gap: 8px; flex: 1;">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search by employee code or username..."
+        class="search-input"
+        style="flex: 1;"
+      />
+      <button (click)="onSearch()" class="btn btn-primary" style="padding: 9px 16px; white-space: nowrap; height: 38px; display: inline-flex; align-items: center;">Search</button>
+    </div>
+
+    <div class="filter-dropdown-wrapper">
+      <select
+        [(ngModel)]="selectedDepartment"
+        (change)="applyLocalFilters()"
+        class="department-select"
+      >
+        <option value="">All Departments</option>
+        @for (dep of departments; track dep) {
+          <option [value]="dep">{{ dep }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Staff profile list -->
+  <div class="table-card">
+    @if (loading) {
+      <div class="loading-wrapper">
+        <div class="spinner"></div>
+        <p>Loading admin staff profiles...</p>
+      </div>
+    } @else {
+      @if (filteredStaff.length === 0) {
+        <div class="empty-state">
+          <p>No admin staff profiles match your search criteria.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table class="staff-table">
+            <thead>
+              <tr>
+                <th>Employee Code</th>
+                <th>Full Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>Contact Number</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of filteredStaff; track s.adminId) {
+                <tr>
+                  <td class="font-semibold">{{ s.employeeCode }}</td>
+                  <td>{{ s.firstName }} {{ s.lastName }}</td>
+                  <td>{{ s.department }}</td>
+                  <td>{{ s.designation }}</td>
+                  <td>{{ s.contactNumber }}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <a [routerLink]="['/admin/users', s.userId, 'details']" class="action-btn view-btn" style="text-decoration: none;" title="View details">
+                        View Details
+                      </a>
+                      <button (click)="openEditModal(s)" class="action-btn edit-btn" title="Edit staff member">
+                        Edit
+                      </button>
+                      @if (s.userId !== loggedUserId) {
+                        <button (click)="deleteStaff(s.adminId)" class="action-btn delete-btn" title="Delete staff profile">
+                          Delete
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create/Edit Modal Popup Overlay -->
+  @if (showModal) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>{{ modalTitle }}</h2>
+          <button (click)="closeModal()" class="close-modal-btn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (formError) {
+            <div class="modal-error-banner">
+              {{ formError }}
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="employeeCode">Employee Code</label>
+            <input
+              type="text"
+              id="employeeCode"
+              [(ngModel)]="formEmployeeCode"
+              placeholder="e.g. EMP-10023"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="department">Department</label>
+              <input
+                type="text"
+                id="department"
+                [(ngModel)]="formDepartment"
+                placeholder="e.g. Administrator"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="designation">Designation</label>
+              <input
+                type="text"
+                id="designation"
+                [(ngModel)]="formDesignation"
+                placeholder="e.g. System Administrator"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                [(ngModel)]="formFirstName"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                [(ngModel)]="formLastName"
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contactNumber">Contact Number</label>
+            <input
+              type="text"
+              id="contactNumber"
+              [(ngModel)]="formContactNumber"
+              class="form-control"
+            />
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeModal()" class="btn-secondary">Cancel</button>
+          <button (click)="saveStaff()" class="btn-primary">Save Profile</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

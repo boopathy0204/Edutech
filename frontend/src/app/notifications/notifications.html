@@ -1,0 +1,78 @@
+<div class="notifications-container">
+  <div class="page-header">
+    <div class="header-title-row">
+      <h1>My Notifications</h1>
+      @if (unreadCount > 0) {
+        <span class="unread-badge font-semibold">{{ unreadCount }} New</span>
+      }
+    </div>
+    <p class="subtitle">Stay updated with class announcements, recently uploaded course materials, and graded assignment reviews.</p>
+  </div>
+
+  @if (loading) {
+    <div class="loading-wrapper">
+      <div class="spinner"></div>
+      <p>Loading notification logs...</p>
+    </div>
+  } @else {
+    @if (error) {
+      <div class="alert error">
+        {{ error }}
+      </div>
+    }
+
+    @if (notifications.length === 0 && !error) {
+      <div class="empty-state-card">
+        <div class="empty-icon">🔔</div>
+        <h2>All Caught Up!</h2>
+        <p>You have no notifications or messages at this time. Announcements will show up here as they occur.</p>
+      </div>
+    } @else {
+      <!-- Notification items list card stack -->
+      <div class="notifications-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 12px; margin-bottom: 24px;">
+          <h2 class="card-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">Recent Alerts Log</h2>
+          @if (unreadCount > 0) {
+            <button
+              (click)="markAllAsRead()"
+              class="read-action-btn"
+              style="padding: 6px 12px; font-size: 12px;"
+            >
+              Mark all as read
+            </button>
+          }
+        </div>
+        
+        <div class="notifications-stack-list">
+          @for (n of notifications; track n.notificationId) {
+            <div class="notification-item-row" [class.unread]="!n.isRead">
+              
+              <div class="status-indicator-dot"></div>
+              
+              <div class="msg-content">
+                <h3 class="msg-title font-semibold">{{ n.title }}</h3>
+                <p class="msg-text">{{ n.message }}</p>
+                <span class="msg-date">{{ n.createdAt | date:'medium' }}</span>
+              </div>
+
+              <div class="msg-actions">
+                @if (!n.isRead) {
+                  <button
+                    (click)="markAsRead(n.notificationId)"
+                    [disabled]="markingId === n.notificationId"
+                    class="read-action-btn"
+                  >
+                    {{ markingId === n.notificationId ? 'Marking...' : 'Mark as Read' }}
+                  </button>
+                } @else {
+                  <span class="read-check-lbl">✓ Read</span>
+                }
+              </div>
+
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
