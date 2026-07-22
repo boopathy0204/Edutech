@@ -19,12 +19,12 @@ public class AcademicRecord {
     @ManyToOne
     @JoinColumn(name = "academic_period_id")
     private AcademicPeriod academicPeriod;
-
     public String getAcademicYear() {
+
         return academicPeriod != null ? academicPeriod.getAcademicYear() : "2026-2027";
     }
-
     public String getAcademicHalf() {
+
         return academicPeriod != null ? academicPeriod.getAcademicHalf() : "FIRST_HALF";
     }
     @ManyToOne

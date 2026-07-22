@@ -12,7 +12,6 @@ public class StatisticsDTO {
     private Integer totalAssignments;
     private Integer completedAssignments;
     private Integer pendingAssignments;
-    private Integer overdueAssignments;
     private Integer gradedAssignments;
     private Integer awaitingGrading;
 

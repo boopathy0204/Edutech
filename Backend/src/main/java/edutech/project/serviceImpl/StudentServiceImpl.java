@@ -115,8 +115,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentResponseDTO getStudentByUser(User user) {
-        Student student = studentRepo.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for this user"));
+        Student student = studentRepo.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Student profile not found for this user"));
         return maptoResponse(student);
     }
 

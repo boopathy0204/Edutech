@@ -1,5 +1,6 @@
 package edutech.project.serviceImpl;
 
+import edutech.project.dto.response.FinalGradeDTO;
 import edutech.project.exception.*;
 import edutech.project.repository.AcademicRecordRepo;
 import edutech.project.repository.CourseRepo;
@@ -194,7 +195,7 @@ public class CourseServiceImpl implements CourseService {
             
             try {
                 // Calculate final grade
-                edutech.project.dto.response.FinalGradeDTO finalGrade = gradeCalculationService.calculateFinalGrade(student.getStudentId(), course.getCourseId());
+                FinalGradeDTO finalGrade = gradeCalculationService.calculateFinalGrade(student.getStudentId(), course.getCourseId());
                 Integer sem = 0;
                 if ("FIRST_HALF".equals(course.getAcademicHalf())) {
                     sem = 1;

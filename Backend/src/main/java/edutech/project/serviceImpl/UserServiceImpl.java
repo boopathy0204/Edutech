@@ -211,6 +211,8 @@ public class UserServiceImpl implements UserService {
             complete = false;
         } else if (user.getRole() == edutech.project.model.Role.PROFESSOR && user.getProfessor() == null) {
             complete = false;
+        } else if (user.getRole() == edutech.project.model.Role.ADMIN && user.getAdminStaff() == null) {
+            complete = false;
         }
         
         return UserResponseDTO.builder()

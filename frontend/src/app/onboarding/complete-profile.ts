@@ -199,7 +199,7 @@ export class CompleteProfile implements OnInit {
       next: () => {
         sessionStorage.setItem('auth_profile_complete', 'true');
         this.loading = false;
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.error('Failed to create admin profile:', err);

@@ -2,6 +2,7 @@ package edutech.project.controller;
 
 import edutech.project.dto.request.AdminStaffRequestDTO;
 import edutech.project.dto.response.AdminStaffResponseDTO;
+import edutech.project.model.AcademicPeriod;
 import edutech.project.service.AdminStaffService;
 import edutech.project.service.AcademicPeriodService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin-staff")
@@ -45,8 +47,7 @@ public class AdminStaffController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{adminId}/update")
-    public ResponseEntity<AdminStaffResponseDTO> updateAdminStaff(@PathVariable Long adminId,
-                                                                  @Valid @RequestBody AdminStaffRequestDTO request) {
+    public ResponseEntity<AdminStaffResponseDTO> updateAdminStaff(@PathVariable Long adminId, @Valid @RequestBody AdminStaffRequestDTO request) {
         return ResponseEntity.ok(adminStaffService.updateAdminStaff(adminId, request));
     }
 
@@ -67,8 +68,8 @@ public class AdminStaffController {
     @PreAuthorize("hasAnyRole('ADMIN','PROFESSOR','STUDENT')")
     @GetMapping("/current-period")
     public ResponseEntity<?> getCurrentPeriod() {
-        edutech.project.model.AcademicPeriod activePeriod = academicPeriodService.getActivePeriod();
-        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        AcademicPeriod activePeriod = academicPeriodService.getActivePeriod();
+        Map<String, Object> response = new java.util.HashMap<>();
         response.put("currentAcademicYear", activePeriod.getAcademicYear());
         response.put("currentAcademicHalf", activePeriod.getAcademicHalf());
         return ResponseEntity.ok(response);

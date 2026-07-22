@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import static edutech.project.model.Role.*;
+
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
@@ -29,9 +31,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = (User) userDetails;
         
         boolean complete = true;
-        if (user.getRole() == edutech.project.model.Role.STUDENT && user.getStudent() == null) {
+        if (user.getRole() == STUDENT && user.getStudent() == null) {
             complete = false;
-        } else if (user.getRole() == edutech.project.model.Role.PROFESSOR && user.getProfessor() == null) {
+        } else if (user.getRole() == PROFESSOR && user.getProfessor() == null) {
+            complete = false;
+        } else if (user.getRole() == ADMIN && user.getAdminStaff() == null) {
             complete = false;
         }
 

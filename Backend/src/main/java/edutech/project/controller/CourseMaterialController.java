@@ -61,8 +61,7 @@ public class CourseMaterialController {
         Resource resource = cmService.downloadMaterial(materialId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + resource.getFilename() + "\""
                 )
                 .body(resource);

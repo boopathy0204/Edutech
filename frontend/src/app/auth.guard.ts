@@ -36,9 +36,13 @@ export const authGuard: CanActivateFn = (route, state) => {
             return true;
           }
 
-          // If complete but visiting complete-profile page, redirect to profile
+          // If complete but visiting complete-profile page, redirect to correct landing page
           if (state.url === '/complete-profile') {
-            router.navigate(['/profile']);
+            if (authService.getRole() === 'ADMIN') {
+              router.navigate(['/dashboard']);
+            } else {
+              router.navigate(['/profile']);
+            }
             return false;
           }
 

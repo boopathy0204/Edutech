@@ -27,10 +27,7 @@ public interface SubmissionRepo extends JpaRepository<Submission,Long> {
                  OR LOWER(st.lastName) LIKE LOWER(CONCAT('%', :query, '%')) 
                  OR LOWER(st.registrationNumber) LIKE LOWER(CONCAT('%', :query, '%')))
             ORDER BY s.submittedAt DESC""")
-    List<Submission> findSubmissionsByAssignmentWithFilters(
-            @Param("assignmentId") Long assignmentId,
-            @Param("status") String status,
-            @Param("query") String query);
+    List<Submission> findSubmissionsByAssignmentWithFilters(@Param("assignmentId") Long assignmentId, @Param("status") String status, @Param("query") String query);
     @Query("""
             SELECT s FROM Submission s
             JOIN FETCH s.student st 
@@ -50,8 +47,7 @@ public interface SubmissionRepo extends JpaRepository<Submission,Long> {
                  OR LOWER(a.title) LIKE LOWER(CONCAT('%', :query, '%'))
                  OR LOWER(c.courseCode) LIKE LOWER(CONCAT('%', :query, '%'))) 
             ORDER BY s.submittedAt DESC""")
-    List<Submission> findSubmissionCenterByProfessor(
-            @Param("professorId") Long professorId,
+    List<Submission> findSubmissionCenterByProfessor(@Param("professorId") Long professorId,
             @Param("courseId") Long courseId,
             @Param("status") String status,
             @Param("query") String query,

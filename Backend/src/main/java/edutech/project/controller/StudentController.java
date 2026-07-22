@@ -1,17 +1,16 @@
 package edutech.project.controller;
 
 import edutech.project.dto.request.StudentRequestDTO;
-import edutech.project.dto.response.BulkImportSummaryDTO;
 import edutech.project.dto.response.StudentResponseDTO;
+import edutech.project.model.User;
 import edutech.project.service.StudentService;
-import edutech.project.util.ExcelHelper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class StudentController {
     }
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student-profile")
-    public ResponseEntity<StudentResponseDTO> getCurrentStudent(@org.springframework.security.core.annotation.AuthenticationPrincipal edutech.project.model.User currentUser) {
+    public ResponseEntity<StudentResponseDTO> getCurrentStudent(@AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(studentService.getStudentByUser(currentUser));
     }
 }

@@ -63,7 +63,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private UserDashboardResponseDTO buildProfessorDashboard(User user, Long academicPeriodId) {
-        Professor professor=professorRepo.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Professor not found"));
+        Professor professor=professorRepo.findByUser(user).orElseThrow(() -> new ResourceNotFoundException("Professor account has been created successfully, but the Professor has not completed their profile yet. Please ask the Professor to complete their registration."));
 
         UserDashboardResponseDTO response=new UserDashboardResponseDTO();
         ProfessorSummary summary=buildProfessorSummary(professor, academicPeriodId);
@@ -126,7 +126,6 @@ public class DashboardServiceImpl implements DashboardService {
                 if (!grade.equalsIgnoreCase("F")) {
                     earned += credits;
                 }
-                
                 totalWeighted += credits * gp;
                 totalCredits += credits;
                 
@@ -161,7 +160,6 @@ public class DashboardServiceImpl implements DashboardService {
         int totalAssignments = 0;
         int completedAssignments = 0;
         int pendingAssignments = 0;
-        int overdueAssignments = 0;
         int gradedAssignments = 0;
         int courseCount = 0;
         List<Enrollment> enrollments=enrollmentRepo.findByStudent(student);
@@ -180,9 +178,6 @@ public class DashboardServiceImpl implements DashboardService {
                     case "NOT_SUBMITTED":
                         pendingAssignments++;
                         break;
-                    case "LATE":
-                        overdueAssignments++;
-                        break;
                     case "SUBMITTED":
                         completedAssignments++;
                         break;
@@ -198,7 +193,6 @@ public class DashboardServiceImpl implements DashboardService {
             .totalAssignments(totalAssignments)
             .completedAssignments(completedAssignments)
             .pendingAssignments(pendingAssignments)
-            .overdueAssignments(overdueAssignments)
             .gradedAssignments(gradedAssignments)
             .awaitingGrading(completedAssignments - gradedAssignments)
             .build();
@@ -216,12 +210,7 @@ public class DashboardServiceImpl implements DashboardService {
         Double marks = null;
         String letterGrade = null;
         if(submission == null){
-            if(assignment.getDueDate().isBefore(LocalDateTime.now())){
-                status="LATE";
-            }
-            else{
                 status="NOT_SUBMITTED";
-            }
         }
         else{
             submissionDate=submission.getSubmittedAt();
