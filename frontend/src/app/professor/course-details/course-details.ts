@@ -189,6 +189,8 @@ export class ProfessorCourseDetails implements OnInit {
 
   // --- SCHEDULE ACTIONS ---
   openScheduleModal() {
+    this.error = '';
+    this.success = '';
     this.formDay = 'MONDAY';
     this.formStartTime = '';
     this.formEndTime = '';
@@ -198,19 +200,21 @@ export class ProfessorCourseDetails implements OnInit {
   }
 
   closeScheduleModal() {
+    this.error = '';
     this.showScheduleModal = false;
     this.cdr.detectChanges();
   }
 
   saveSchedule() {
+    this.error = '';
+    this.success = '';
+    
     if (!this.formStartTime || !this.formEndTime || !this.formRoomNumber.trim()) {
-      alert('Please fill out all required schedule fields.');
+      this.error = 'Please fill out all required schedule fields.';
       return;
     }
 
     this.savingSchedule = true;
-    this.error = '';
-    this.success = '';
     this.cdr.detectChanges();
 
     // Map time strings to HH:mm:ss format
@@ -237,7 +241,7 @@ export class ProfessorCourseDetails implements OnInit {
         const errMsg = (typeof err.error === 'string') 
           ? err.error 
           : (err.error?.message || err.message || 'Failed to save schedule conflict check. Make sure there are no overlaps.');
-        alert(errMsg);
+        this.error = errMsg;
         this.savingSchedule = false;
         this.cdr.detectChanges();
       }

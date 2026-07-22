@@ -76,10 +76,6 @@ public class DashboardServiceImpl implements DashboardService {
 
     }
 
-    private UserDashboardResponseDTO buildAdminDashboard(User user) {
-        return new UserDashboardResponseDTO();
-
-    }
     private AccountDTO buildAccount(User user) {
         return AccountDTO.builder()
                 .userId(user.getUserId())

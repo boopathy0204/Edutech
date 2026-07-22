@@ -7,7 +7,7 @@
   @if (success) {
     <div class="alert success" style="margin-bottom: 20px;">{{ success }}</div>
   }
-  @if (error) {
+  @if (error && !showScheduleModal && !showMaterialModal) {
     <div class="alert error" style="margin-bottom: 20px;">{{ error }}</div>
   }
 
@@ -310,6 +310,9 @@
       </div>
 
       <div class="modal-body">
+        @if (error) {
+          <div class="alert error" style="margin-bottom: 16px;">{{ error }}</div>
+        }
         <form (ngSubmit)="saveSchedule()">
           <div class="form-group">
             <label class="form-lbl">Day of the Week <span class="required">*</span></label>
