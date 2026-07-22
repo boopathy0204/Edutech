@@ -21,6 +21,11 @@ public class Course {
     @Column(length = 2000)
     private String description;
     private Integer credits;
+    private LocalDate enrollmentStartDate;
+    private LocalDate enrollmentEndDate;
+    private LocalDate courseStartDate;
+    private LocalDate courseEndDate;
+    private String courseStatus = "UPCOMING";
     @ManyToOne
     @JoinColumn(name = "professor_id")
     private Professor professor;
@@ -36,21 +41,17 @@ public class Course {
     public String getAcademicHalf() {
         return academicPeriod != null ? academicPeriod.getAcademicHalf() : "FIRST_HALF";
     }
-    private LocalDate enrollmentStartDate;
-    private LocalDate enrollmentEndDate;
-    private LocalDate courseStartDate;
-    private LocalDate courseEndDate;
-    private String courseStatus = "UPCOMING";
+
 
     public String getCourseStatus() {
         if ("COMPLETED".equalsIgnoreCase(this.courseStatus)) {
             return "COMPLETED";
         }
         LocalDate now = LocalDate.now();
-        if (this.courseEndDate != null && now.isAfter(this.courseEndDate)) {
+        if (now.isAfter(this.courseEndDate)) {
             return "COMPLETED";
         }
-        if (this.courseStartDate != null && now.isBefore(this.courseStartDate)) {
+        if ( now.isBefore(this.courseStartDate)) {
             return "UPCOMING";
         }
         return "ACTIVE";

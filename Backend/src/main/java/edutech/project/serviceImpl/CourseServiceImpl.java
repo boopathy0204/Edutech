@@ -2,6 +2,7 @@ package edutech.project.serviceImpl;
 
 import edutech.project.dto.response.FinalGradeDTO;
 import edutech.project.exception.*;
+import edutech.project.model.*;
 import edutech.project.repository.AcademicRecordRepo;
 import edutech.project.repository.CourseRepo;
 import edutech.project.repository.EnrollmentRepo;
@@ -10,11 +11,6 @@ import edutech.project.service.AcademicPeriodService;
 import edutech.project.service.CourseService;
 import edutech.project.dto.request.CourseRequestDTO;
 import edutech.project.dto.response.CourseResponseDTO;
-import edutech.project.model.Course;
-import edutech.project.model.Professor;
-import edutech.project.model.Student;
-import edutech.project.model.Enrollment;
-import edutech.project.model.AcademicRecord;
 import edutech.project.service.GradeCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +38,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponseDTO createCourse(CourseRequestDTO request) {
         Professor professor = professorRepo.findById(request.getProfessorId()).orElseThrow(() -> new ResourceNotFoundException("Professor not found"));
-        edutech.project.model.AcademicPeriod activePeriod = academicPeriodService.getActivePeriod();
+        AcademicPeriod activePeriod = academicPeriodService.getActivePeriod();
         
         if (courseRepo.existsByCourseCodeAndAcademicPeriod(
                 request.getCourseCode(), 
@@ -99,8 +95,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(Long courseId) {
-        Course course = courseRepo.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        Course course = courseRepo.findById(courseId).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
         courseRepo.delete(course);
     }
 
@@ -135,8 +130,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponseDTO> getCoursesByProfessor(Long professorId, String query, Long academicPeriodId) {
-        Professor professor = professorRepo.findById(professorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Professor not found"));
+        Professor professor = professorRepo.findById(professorId).orElseThrow(() -> new ResourceNotFoundException("Professor not found"));
 
         List<Course> courses;
         if (query == null || query.isBlank()) {

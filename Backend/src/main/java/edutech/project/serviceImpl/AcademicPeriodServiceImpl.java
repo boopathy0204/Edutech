@@ -80,14 +80,11 @@ public class AcademicPeriodServiceImpl implements AcademicPeriodService {
         if ("FIRST_HALF".equalsIgnoreCase(currentHalf)) {
             nextHalf = "SECOND_HALF";
         } else {
-            try {
-                String[] parts = currentYear.split("-");
-                int year1 = Integer.parseInt(parts[0]);
-                int year2 = Integer.parseInt(parts[1]);
-                nextYear = (year1 + 1) + "-" + (year2 + 1);
-            } catch (Exception ex) {
-                nextYear = "2027-2028";
-            }
+
+            String[] parts = currentYear.split("-");
+            int year1 = Integer.parseInt(parts[0]);
+            int year2 = Integer.parseInt(parts[1]);
+            nextYear = (year1 + 1) + "-" + (year2 + 1);
             nextHalf = "FIRST_HALF";
         }
         

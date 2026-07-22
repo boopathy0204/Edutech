@@ -126,9 +126,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
          if(status.equalsIgnoreCase("Active")) {
              enrollment.setStatus(EnrollmentStatus.ACTIVE);
          }
-         else if (status.equalsIgnoreCase("Dropped")) {
-             enrollment.setStatus(EnrollmentStatus.DROPPED);
-         }
          else if(status.equalsIgnoreCase("Completed")){
              enrollment.setStatus(EnrollmentStatus.COMPLETED);
          }

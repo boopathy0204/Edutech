@@ -3,6 +3,8 @@ package edutech.project.dto.request;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class CourseRequestDTO {
     @NotBlank(message = "Course code is required")
@@ -14,9 +16,12 @@ public class CourseRequestDTO {
     private Integer credits;
     @NotNull(message = "Professor Id is required")
     private Long professorId;
-
-    private java.time.LocalDate enrollmentStartDate;
-    private java.time.LocalDate enrollmentEndDate;
-    private java.time.LocalDate courseStartDate;
-    private java.time.LocalDate courseEndDate;
+    @NotNull(message = "Enrollment start date is required")
+    private LocalDate enrollmentStartDate;
+    @NotNull(message = "Enrollment end date is required")
+    private LocalDate enrollmentEndDate;
+    @NotNull(message = "Course start date is required")
+    private LocalDate courseStartDate;
+    @NotNull(message = "Course end date is required")
+    private LocalDate courseEndDate;
 }

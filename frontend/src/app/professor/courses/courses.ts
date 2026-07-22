@@ -147,6 +147,8 @@ export class ProfessorCourses implements OnInit {
   }
 
   openCreateModal() {
+    this.error = '';
+    this.success = '';
     this.modalTitle = 'Create Course';
     this.editingCourseId = null;
     this.formCode = '';
@@ -163,6 +165,8 @@ export class ProfessorCourses implements OnInit {
   }
 
   openEditModal(course: any) {
+    this.error = '';
+    this.success = '';
     this.modalTitle = 'Edit Course';
     this.editingCourseId = course.courseId;
     this.formCode = course.courseCode;
@@ -179,6 +183,7 @@ export class ProfessorCourses implements OnInit {
   }
 
   closeModal() {
+    this.error = '';
     this.showModal = false;
     this.cdr.detectChanges();
   }
@@ -243,7 +248,11 @@ export class ProfessorCourses implements OnInit {
         },
         error: (err) => {
           console.error('Update failed:', err);
-          this.error = (typeof err.error === 'string') ? err.error : (err.error?.message || 'Failed to update course in the database.');
+          if (Array.isArray(err.error)) {
+            this.error = err.error.join(', ');
+          } else {
+            this.error = (typeof err.error === 'string') ? err.error : (err.error?.message || 'Failed to update course in the database.');
+          }
           this.saving = false;
           this.cdr.detectChanges();
         }
@@ -263,7 +272,11 @@ export class ProfessorCourses implements OnInit {
         },
         error: (err) => {
           console.error('Create failed:', err);
-          this.error = (typeof err.error === 'string') ? err.error : (err.error?.message || 'Failed to create course in the database.');
+          if (Array.isArray(err.error)) {
+            this.error = err.error.join(', ');
+          } else {
+            this.error = (typeof err.error === 'string') ? err.error : (err.error?.message || 'Failed to create course in the database.');
+          }
           this.saving = false;
           this.cdr.detectChanges();
         }

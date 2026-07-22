@@ -14,7 +14,7 @@
   @if (success) {
     <div class="alert success">{{ success }}</div>
   }
-  @if (error) {
+  @if (error && !showModal) {
     <div class="alert error">{{ error }}</div>
   }
 
@@ -133,6 +133,9 @@
       </div>
 
       <div class="modal-body">
+        @if (error) {
+          <div class="alert error">{{ error }}</div>
+        }
         <form (ngSubmit)="saveCourse()" #courseForm="ngForm">
           <div class="form-group">
             <label class="form-lbl">Course Code <span class="required">*</span></label>

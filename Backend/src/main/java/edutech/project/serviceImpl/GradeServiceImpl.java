@@ -11,11 +11,12 @@ import edutech.project.repository.GradeRepo;
 import edutech.project.repository.StudentRepo;
 import edutech.project.repository.SubmissionRepo;
 import edutech.project.service.GradeService;
-
+import edutech.project.util.GradeUtil;
 import java.util.ArrayList;
 import java.util.List;
 
 import edutech.project.service.NotificationService;
+import edutech.project.util.GradeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,8 @@ public class GradeServiceImpl implements GradeService {
     private AssignmentRepo assignmentRepo;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private GradeUtil gradeUtil;
     @Override
     public GradeResponseDTO createGrade(GradeRequestDTO request){
         Submission submission=submissionRepo.findById(request.getSubmissionId()).orElseThrow(()->new ResourceNotFoundException("submission not found"));
@@ -45,7 +48,7 @@ public class GradeServiceImpl implements GradeService {
         Double percentage = percentage(request.getMarks(), submission);
         grade.setMarks(request.getMarks());
         grade.setPercentage(percentage);
-        grade.setLetterGrade(letterGrade(percentage));
+        grade.setLetterGrade(gradeUtil.calculateLetterGrade(percentage));
         grade.setFeedback(request.getFeedback());
         grade.setSubmission(submission);
         //save
@@ -59,21 +62,7 @@ public class GradeServiceImpl implements GradeService {
         Integer maxMark=submission.getAssignment().getMaxMarks();
         return mark/maxMark*100;
     }
-    private String letterGrade(Double percentage){
-        if(percentage>=90){
-            return "O";
-        }
-        if (percentage >=80) {
-            return "A";
-        }
-        if(percentage>=70){
-            return "B";
-        }
-        if(percentage>=60){
-            return "C";
-        }
-        return "D";
-    }
+
     @Override
     public GradeResponseDTO getGradeById(Long gradeId) {
         Grade grade = gradeRepo.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("Grade not found"));
@@ -90,8 +79,7 @@ public class GradeServiceImpl implements GradeService {
     }
     @Override
     public List<GradeResponseDTO> getGradeByStudent(Long studentId, Long academicPeriodId) {
-        Student student = studentRepo.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        Student student = studentRepo.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Student not found"));
         List<Grade> grades = gradeRepo.findBySubmission_Student(student);
         List<GradeResponseDTO> response = new ArrayList<>();
         for (Grade grade : grades) {
@@ -104,8 +92,7 @@ public class GradeServiceImpl implements GradeService {
     }
     @Override
     public List<GradeResponseDTO> getGradeByAssignment(Long assignmentId) {
-        Assignment assignment = assignmentRepo.findById(assignmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
+        Assignment assignment = assignmentRepo.findById(assignmentId).orElseThrow(() -> new ResourceNotFoundException("Assignment not found"));
         List<Grade> grades = gradeRepo.findBySubmission_Assignment(assignment);
         List<GradeResponseDTO> response = new ArrayList<>();
         for (Grade grade : grades) {
