@@ -228,7 +228,7 @@ export class ProfessorCourseDetails implements OnInit {
       roomNumber: this.formRoomNumber.trim()
     };
 
-    this.http.post<any>('/api/schedule', payload).subscribe({
+    this.http.post('/api/schedule', payload, { responseType: 'text' }).subscribe({
       next: () => {
         this.success = 'Schedule added successfully!';
         this.loadScheduleList();
