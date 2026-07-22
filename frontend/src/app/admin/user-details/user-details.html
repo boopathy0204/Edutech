@@ -42,9 +42,11 @@
         <button (click)="openEdit()" class="action-btn secondary-btn">
           Edit Account
         </button>
-        <button (click)="toggleEnable()" class="action-btn" [class.danger-btn]="user.enabled" [class.success-btn]="!user.enabled">
-          {{ user.enabled ? 'Disable Account' : 'Enable Account' }}
-        </button>
+        @if (user.role !== 'ADMIN') {
+          <button (click)="toggleEnable()" class="action-btn" [class.danger-btn]="user.enabled" [class.success-btn]="!user.enabled">
+            {{ user.enabled ? 'Disable Account' : 'Enable Account' }}
+          </button>
+        }
         <button (click)="resetPassword()" class="action-btn warning-btn">
           Forced Password Reset
         </button>

@@ -260,9 +260,11 @@
                       <a [routerLink]="['/admin/users', u.userId, 'details']" class="action-btn edit-btn" style="text-decoration: none;" title="View user details">
                         View Details
                       </a>
-                      <button (click)="openEditModal(u)" class="action-btn edit-btn" title="Edit account">
-                        Edit
-                      </button>
+                      @if (u.role !== 'ADMIN') {
+                        <button (click)="openEditModal(u)" class="action-btn edit-btn" title="Edit account">
+                          Edit
+                        </button>
+                      }
                       @if (u.userId !== loggedUserId) {
                         <button (click)="deleteUser(u.userId)" class="action-btn delete-btn" title="Delete account">
                           Delete
