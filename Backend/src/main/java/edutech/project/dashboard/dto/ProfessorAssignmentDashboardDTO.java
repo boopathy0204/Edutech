@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,7 +16,7 @@ public class ProfessorAssignmentDashboardDTO {
     private Long assignmentId;
     private String assignmentTitle;
     private String courseName;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private Integer totalSubmissions;
     private Integer gradedSubmissions;
     private Integer pendingGrading;

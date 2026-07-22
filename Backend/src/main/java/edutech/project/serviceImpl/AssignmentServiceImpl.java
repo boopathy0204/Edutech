@@ -14,6 +14,7 @@ import edutech.project.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class AssignmentServiceImpl implements AssignmentService {
             if(assignmentRepo.existsByCourseAndTitle(course,request.getTitle())){
                 throw new DuplicateResourceException("Title is already exist");
             }
-            if((request.getDueDate()).isBefore(LocalDateTime.now())){
+            if((request.getDueDate()).isBefore(LocalDate.now())){
                 throw new RuntimeException("Due date need to in future.");
             }
 
@@ -78,7 +79,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         if(assignmentRepo.existsByCourseAndTitleAndAssignmentIdNot(course,request.getTitle(),assignmentId)){
             throw new DuplicateResourceException("Title is already exist");
         }
-        if((request.getDueDate()).isBefore(LocalDateTime.now())){
+        if((request.getDueDate()).isBefore(LocalDate.now())){
             throw new RuntimeException("Due date need to in future.");
         }
         assignment.setTitle(request.getTitle());

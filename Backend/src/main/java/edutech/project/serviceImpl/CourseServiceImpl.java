@@ -45,6 +45,12 @@ public class CourseServiceImpl implements CourseService {
                 activePeriod)) {
             throw new DuplicateResourceException("Course Code already exists in this academic period");
         }
+        if(request.getEnrollmentStartDate().isAfter(request.getEnrollmentEndDate())){
+            throw new IllegalArgumentException("Enrollment start must before Enrollment end date");
+        }
+        if(request.getCourseStartDate().isAfter(request.getCourseEndDate())){
+            throw new IllegalArgumentException("Course start must before Course end date");
+        }
 
         Course course=new Course();
         course.setCourseCode(request.getCourseCode());

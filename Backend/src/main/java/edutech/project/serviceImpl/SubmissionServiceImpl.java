@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class SubmissionServiceImpl implements SubmissionService {
         if (submissionRepo.existsByStudentAndAssignment(student, assignment)) {
             throw new DuplicateResourceException("Student already submitted");
         }
-        if (assignment.getDueDate().isBefore(LocalDateTime.now())) {
+        if (assignment.getDueDate().isBefore(LocalDate.now())) {
             throw new RuntimeException("Assignment due_date passed");
         }
         String filePath = fileStorageService.uploadFile(file, "Submission");

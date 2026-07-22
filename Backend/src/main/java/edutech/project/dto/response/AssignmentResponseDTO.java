@@ -1,10 +1,9 @@
 package edutech.project.dto.response;
 
-import edutech.project.model.Course;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -12,7 +11,7 @@ public class AssignmentResponseDTO {
     private Long assignmentId;
     private String title;
     private String description;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private Integer maxMarks;
     private Long courseId;
     private String courseName;

@@ -182,7 +182,7 @@ export class ProfessorAssignments implements OnInit {
     this.formCourseId = assignment.courseId;
     this.formTitle = assignment.title;
     this.formDesc = assignment.description;
-    this.formDueDate = assignment.dueDate ? assignment.dueDate.substring(0, 16) : '';
+    this.formDueDate = assignment.dueDate ? assignment.dueDate.substring(0, 10) : '';
     this.formMaxMarks = assignment.maxMarks;
     this.showModal = true;
     this.cdr.detectChanges();

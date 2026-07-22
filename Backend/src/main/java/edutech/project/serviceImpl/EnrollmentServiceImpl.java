@@ -40,10 +40,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         
         // Rule 2: Current date must be within enrollment start and end dates
         LocalDate now = LocalDate.now();
-        if (course.getEnrollmentStartDate() != null && now.isBefore(course.getEnrollmentStartDate())) {
+        if (now.isBefore(course.getEnrollmentStartDate())) {
             throw new IllegalArgumentException("Enrollment has not started yet.");
         }
-        if (course.getEnrollmentEndDate() != null && now.isAfter(course.getEnrollmentEndDate())) {
+        if (now.isAfter(course.getEnrollmentEndDate())) {
             throw new IllegalArgumentException("Enrollment period has ended.");
         }
 

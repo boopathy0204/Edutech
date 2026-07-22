@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,7 +16,7 @@ public class AssignmentRequestDTO {
     @NotBlank(message = "description is required")
     private String description;
     @NotNull(message = "dueDate is required")
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     @Min(value=0)
     private Integer maxMarks;
     @NotNull(message = "courseId is required")

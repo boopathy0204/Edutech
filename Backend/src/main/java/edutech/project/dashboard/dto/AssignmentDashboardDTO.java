@@ -15,7 +15,7 @@ public class AssignmentDashboardDTO {
     private Long assignmentId;
     private String assignmentTitle;
     private String courseName;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private String submissionStatus;
     private LocalDateTime submissionDate;
     private Double marksObtained;
