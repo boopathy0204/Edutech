@@ -234,7 +234,10 @@ export class ProfessorCourseDetails implements OnInit {
       },
       error: (err) => {
         console.error('Failed to save schedule:', err);
-        alert(err.error?.message || 'Failed to save schedule conflict check. Make sure there are no overlaps.');
+        const errMsg = (typeof err.error === 'string') 
+          ? err.error 
+          : (err.error?.message || err.message || 'Failed to save schedule conflict check. Make sure there are no overlaps.');
+        alert(errMsg);
         this.savingSchedule = false;
         this.cdr.detectChanges();
       }
