@@ -19,5 +19,4 @@ public class StudentProfileDTO {
     private Double currentHalfGpa;
     private Double cgpa;
     private Integer totalCreditsEarned;
-    private Integer totalCreditsCompleted;
 }

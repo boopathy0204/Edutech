@@ -34,13 +34,13 @@ export class Layout implements OnInit {
     this.role = this.authService.getRole() || '';
     this.generateNavItems();
 
-    // Fetch all periods for dropdown
-    this.academicPeriodService.getAllPeriods().subscribe(data => {
-      this.periods = data;
+    // Fetch and sync periods list reactively
+    this.academicPeriodService.periodsChanged$.subscribe(() => {
+      this.academicPeriodService.getAllPeriods().subscribe(data => {
+        this.periods = data;
+      });
+      this.academicPeriodService.getActivePeriod().subscribe();
     });
-
-    // Get active period
-    this.academicPeriodService.getActivePeriod().subscribe();
 
     // Subscribe to selection changes
     this.academicPeriodService.selectedPeriod$.subscribe(period => {

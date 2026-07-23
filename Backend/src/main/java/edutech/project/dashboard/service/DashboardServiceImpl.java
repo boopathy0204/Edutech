@@ -105,7 +105,6 @@ public class DashboardServiceImpl implements DashboardService {
         List<AcademicRecord> records = academicRecordRepo.findByStudent(student);
         
         int earned = 0;
-        int completed = 0;
         double totalWeighted = 0;
         int totalCredits = 0;
         
@@ -118,7 +117,6 @@ public class DashboardServiceImpl implements DashboardService {
                 int credits = record.getCourse().getCredits();
                 int gp = getGradePoint(grade);
                 
-                completed += credits;
                 if (!grade.equalsIgnoreCase("F")) {
                     earned += credits;
                 }
@@ -148,7 +146,6 @@ public class DashboardServiceImpl implements DashboardService {
                 .currentHalfGpa(currentGpa)
                 .cgpa(cgpa)
                 .totalCreditsEarned(earned)
-                .totalCreditsCompleted(completed)
                 .build();
     }
     private StudentAssignmentSummary buildAssignmentSummary(Student student, Long academicPeriodId) {

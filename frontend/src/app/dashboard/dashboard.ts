@@ -131,6 +131,7 @@ export class Dashboard implements OnInit {
       next: () => {
         this.transitionSuccess = 'Academic period advanced successfully!';
         this.transitioning = false;
+        this.academicPeriodService.triggerPeriodsRefresh();
         this.loadDashboardData();
         this.http.get<any>('/api/admin-staff/current-period').subscribe({
           next: (p) => {
